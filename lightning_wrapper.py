@@ -1,5 +1,6 @@
 import torch
 from hydra.utils import instantiate
+from ignite.metrics import Accuracy
 from pytorch_lightning import LightningModule
 from torch.utils.data import DataLoader
 
@@ -34,13 +35,13 @@ class LightningModel(LightningModule):
     def validation_step(self, batch, batch_idx):
         x, y_true = batch
         y_pred = self.model(x)
-        loss = self.loss(y_pred, y_true)
-
-        return {'val_loss': loss}
+        return {'y_pred': y_pred, 'y_true': y_true}
 
     def validation_epoch_end(self, outputs):
-        val_losses = list(map(lambda x: x['val_loss'], outputs))
-        val_loss = torch.mean(torch.stack(val_losses))
+        y_pred, y_true = zip(*map(lambda x: (x['y_pred'], x['y_true']), outputs))
+        y_pred, y_true = torch.cat(y_pred), torch.cat(y_true)
+
+        val_loss = self.loss(y_pred, y_true)
         logs = {'val_loss': val_loss}
         return {'val_loss': val_loss, 'log': logs}
 
@@ -54,7 +55,6 @@ class LightningModel(LightningModule):
                               train_conf.batch_size,
                               shuffle=True,
                               num_workers=train_conf.num_workers)
-
         return train_dl
 
     def val_dataloader(self):
@@ -63,5 +63,4 @@ class LightningModel(LightningModule):
         val_dl = DataLoader(train_ds,
                             train_conf.batch_size,
                             num_workers=train_conf.num_workers)
-
         return val_dl
