@@ -1,6 +1,5 @@
 import torch
 from hydra.utils import instantiate
-from ignite.metrics import Accuracy
 from pytorch_lightning import LightningModule
 from torch.utils.data import DataLoader
 
@@ -45,9 +44,6 @@ class LightningModel(LightningModule):
         logs = {'val_loss': val_loss}
         return {'val_loss': val_loss, 'log': logs}
 
-    def configure_optimizers(self):
-        return self.optimizer
-
     def train_dataloader(self):
         train_conf = self.train_conf
         train_ds = instantiate(self.dataset_conf.train)
@@ -64,3 +60,6 @@ class LightningModel(LightningModule):
                             train_conf.batch_size,
                             num_workers=train_conf.num_workers)
         return val_dl
+
+    def configure_optimizers(self):
+        return self.optimizer
