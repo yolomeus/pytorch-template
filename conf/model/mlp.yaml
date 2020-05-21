@@ -1,0 +1,6 @@
+model:
+  class: model.mlp.MLP
+  params:
+    in_dim: 784
+    h_dim: 128
+    out_dim: 10

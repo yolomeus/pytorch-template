@@ -1,0 +1,18 @@
+defaults:
+  - model: mlp
+  - dataset: fashion_mnist
+
+training:
+  epochs: 10
+  batch_size: 32
+  num_workers: 0
+
+loss:
+  class: torch.nn.CrossEntropyLoss
+  params:
+    reduction: mean
+
+optimizer:
+  class: torch.optim.Adam
+  params:
+    lr: 1e-3
