@@ -2,6 +2,8 @@ defaults:
   - model: mlp
   - dataset: fashion_mnist
 
+gpus: 1
+
 training:
   epochs: 10
   batch_size: 32
