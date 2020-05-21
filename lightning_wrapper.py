@@ -1,7 +1,10 @@
 import torch
 from hydra.utils import instantiate
+from omegaconf import DictConfig
 from pytorch_lightning import LightningModule
 from torch.utils.data import DataLoader
+
+from metrics import Accuracy
 
 
 class LightningModel(LightningModule):
@@ -9,7 +12,11 @@ class LightningModel(LightningModule):
     for configuring the whole training and evaluation process.
     """
 
-    def __init__(self, hparams):
+    def __init__(self, hparams: DictConfig):
+        """
+
+        :param hparams: contains model hyperparameters and all training settings.
+        """
         super().__init__()
         self.hparams = dict(hparams)
 
@@ -29,7 +36,15 @@ class LightningModel(LightningModule):
         loss = self.loss(y_pred, y_true)
 
         logs = {'loss': loss}
-        return {'loss': loss, 'log': logs}
+        return {'loss': loss, 'log': logs, 'y_pred': y_pred, 'y_true': y_true}
+
+    def training_epoch_end(self, outputs):
+        y_pred, y_true = self._unpack_outputs('y_pred', outputs), self._unpack_outputs('y_true', outputs)
+        y_pred = torch.softmax(y_pred, dim=-1).argmax(dim=-1)
+
+        acc = Accuracy()(y_pred.cpu(), y_true.cpu())
+        logs = {'acc': acc}
+        return {'acc': acc, 'log': logs}
 
     def validation_step(self, batch, batch_idx):
         x, y_true = batch
@@ -37,8 +52,7 @@ class LightningModel(LightningModule):
         return {'y_pred': y_pred, 'y_true': y_true}
 
     def validation_epoch_end(self, outputs):
-        y_pred, y_true = zip(*map(lambda x: (x['y_pred'], x['y_true']), outputs))
-        y_pred, y_true = torch.cat(y_pred), torch.cat(y_true)
+        y_pred, y_true = self._unpack_outputs('y_pred', outputs), self._unpack_outputs('y_true', outputs)
 
         val_loss = self.loss(y_pred, y_true)
         logs = {'val_loss': val_loss}
@@ -63,3 +77,13 @@ class LightningModel(LightningModule):
 
     def configure_optimizers(self):
         return self.optimizer
+
+    @staticmethod
+    def _unpack_outputs(key, outputs):
+        """Get the values of each output dict at key.
+
+        :param key: key that gets the values from each output dict.
+        :param outputs: a list of output dicts
+        :return: the concatenation of all output dict values at key.
+        """
+        return torch.cat(list(map(lambda x: x[key], outputs)))
