@@ -1,3 +1,4 @@
+import torch
 from hydra.utils import instantiate
 from pytorch_lightning import LightningModule
 from torch.utils.data import DataLoader
@@ -27,9 +28,21 @@ class LightningModel(LightningModule):
         y_pred = self.model(x)
         loss = self.loss(y_pred, y_true)
 
-        # add logging
         logs = {'loss': loss}
         return {'loss': loss, 'log': logs}
+
+    def validation_step(self, batch, batch_idx):
+        x, y_true = batch
+        y_pred = self.model(x)
+        loss = self.loss(y_pred, y_true)
+
+        return {'val_loss': loss}
+
+    def validation_epoch_end(self, outputs):
+        val_losses = list(map(lambda x: x['val_loss'], outputs))
+        val_loss = torch.mean(torch.stack(val_losses))
+        logs = {'val_loss': val_loss}
+        return {'val_loss': val_loss, 'log': logs}
 
     def configure_optimizers(self):
         return self.optimizer
@@ -43,3 +56,12 @@ class LightningModel(LightningModule):
                               num_workers=train_conf.num_workers)
 
         return train_dl
+
+    def val_dataloader(self):
+        train_conf = self.train_conf
+        train_ds = instantiate(self.dataset_conf.validation)
+        val_dl = DataLoader(train_ds,
+                            train_conf.batch_size,
+                            num_workers=train_conf.num_workers)
+
+        return val_dl
