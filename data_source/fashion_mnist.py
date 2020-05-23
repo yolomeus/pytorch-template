@@ -12,10 +12,9 @@ class FashionMNIST(Dataset):
     def __init__(self, img_path, label_path, autoencoder_mode=False):
         """
 
-        Args:
-            img_path: path to image dataset file (assumed to be in .gz format)
-            label_path: path to label file (assumed to be in .gz format)
-            autoencoder_mode: return inputs as labels if true.
+        :param img_path: path to image dataset file (assumed to be in .gz format)
+        :param label_path: path to label file (assumed to be in .gz format)
+        :param autoencoder_mode:  return inputs as labels if true.
         """
         self.autoencoder_mode = autoencoder_mode
         self.images, self.labels = self.load_mnist(img_path, label_path)
