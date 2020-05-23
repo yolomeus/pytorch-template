@@ -3,12 +3,16 @@ defaults:
   - dataset: fashion_mnist
 
 gpus: 1
+num_workers: 0
 random_seed: 1590258941
 
 training:
   epochs: 10
   batch_size: 32
-  num_workers: 0
+
+testing:
+  batch_size: 128
+
 
 loss:
   class: torch.nn.CrossEntropyLoss

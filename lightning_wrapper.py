@@ -25,6 +25,7 @@ class LightningModel(LightningModule):
 
         self.dataset_conf = hparams.dataset
         self.train_conf = hparams.training
+        self.test_conf = hparams.testing
 
     def forward(self, inputs):
         return self.model(inputs)
@@ -41,6 +42,9 @@ class LightningModel(LightningModule):
         x, y_true = batch
         y_pred = self.model(x)
         return {'y_pred': y_pred, 'y_true': y_true}
+
+    def test_step(self, batch, batch_idx):
+        return self.validation_step(batch, batch_idx)
 
     def training_epoch_end(self, outputs):
         y_pred, y_true = self._unpack_outputs('y_pred', outputs), self._unpack_outputs('y_true', outputs)
@@ -62,21 +66,27 @@ class LightningModel(LightningModule):
         return {'val_loss': val_loss, 'log': val_logs}
 
     def train_dataloader(self):
-        train_conf = self.train_conf
         train_ds = instantiate(self.dataset_conf.train)
         train_dl = DataLoader(train_ds,
-                              train_conf.batch_size,
+                              self.train_conf.batch_size,
                               shuffle=True,
-                              num_workers=train_conf.num_workers)
+                              num_workers=self.hparams['num_workers'])
         return train_dl
 
     def val_dataloader(self):
-        train_conf = self.train_conf
         train_ds = instantiate(self.dataset_conf.validation)
         val_dl = DataLoader(train_ds,
-                            train_conf.batch_size,
-                            num_workers=train_conf.num_workers)
+                            self.test_conf.batch_size,
+                            num_workers=self.hparams['num_workers'])
         return val_dl
+
+    def test_dataloader(self):
+        test_conf = self.test_conf
+        train_ds = instantiate(self.dataset_conf.test)
+        test_dl = DataLoader(train_ds,
+                             test_conf.batch_size,
+                             num_workers=self.hparams.num_workers)
+        return test_dl
 
     def configure_optimizers(self):
         return self.optimizer
