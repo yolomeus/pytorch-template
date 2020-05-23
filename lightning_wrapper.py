@@ -1,6 +1,6 @@
 import torch
 from hydra.utils import instantiate
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
 from pytorch_lightning import LightningModule
 from torch.utils.data import DataLoader
 
@@ -15,7 +15,7 @@ class LightningModel(LightningModule):
         :param hparams: contains model hyperparameters and training settings.
         """
         super().__init__()
-        self.hparams = dict(hparams)
+        self.hparams = OmegaConf.to_container(hparams, resolve=True)
 
         self.model = instantiate(hparams.model)
         self.loss = instantiate(hparams.loss)
