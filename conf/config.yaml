@@ -3,6 +3,7 @@ defaults:
   - dataset: fashion_mnist
 
 gpus: 1
+random_seed: 1590258941
 
 training:
   epochs: 10
