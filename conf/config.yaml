@@ -18,3 +18,7 @@ optimizer:
   class: torch.optim.Adam
   params:
     lr: 1e-3
+
+metrics:
+  - accuracy:
+    class: metrics.Accuracy
