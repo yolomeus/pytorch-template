@@ -35,7 +35,7 @@ class LightningModel(LightningModule):
         y_pred = self.model(x)
         loss = self.loss(y_pred, y_true)
 
-        logs = {'loss': loss}
+        logs = {'batch_loss': loss}
         return {'loss': loss, 'log': logs, 'y_pred': y_pred, 'y_true': y_true}
 
     def validation_step(self, batch, batch_idx):
@@ -47,23 +47,28 @@ class LightningModel(LightningModule):
         return self.validation_step(batch, batch_idx)
 
     def training_epoch_end(self, outputs):
-        y_pred, y_true = self._unpack_outputs('y_pred', outputs), self._unpack_outputs('y_true', outputs)
-
-        logs = {self._classname(metric): metric(y_pred, y_true) for metric in self.metrics}
-        loss = self.loss(y_pred, y_true)
-        logs['loss'] = loss
-
-        return {'log': logs}
+        return self._epoch_end('train', outputs)
 
     def validation_epoch_end(self, outputs):
+        return self._epoch_end('val', outputs)
+
+    def test_epoch_end(self, outputs):
+        return self._epoch_end('test', outputs)
+
+    def _epoch_end(self, prefix, outputs):
+        """Compute loss and all metrics at the end of an epoch.
+
+        :param prefix: prefix for logs e.g. train, test, validation
+        :param outputs: gathered outputs from *_epoch_end
+        :return: a dict containing loss and metric logs.
+        """
         y_pred, y_true = self._unpack_outputs('y_pred', outputs), self._unpack_outputs('y_true', outputs)
 
-        val_logs = {'val_' + self._classname(metric): metric(y_pred, y_true) for metric in self.metrics}
+        logs = {f'{prefix}_' + self._classname(metric): metric(y_pred, y_true) for metric in self.metrics}
+        loss = self.loss(y_pred, y_true)
+        logs[f'{prefix}_loss'] = loss
 
-        val_loss = self.loss(y_pred, y_true)
-        val_logs['val_loss'] = val_loss
-
-        return {'val_loss': val_loss, 'log': val_logs}
+        return {'log': logs}
 
     def train_dataloader(self):
         train_ds = instantiate(self.dataset_conf.train)

@@ -13,11 +13,8 @@ training:
 testing:
   batch_size: 128
 
-
 loss:
   class: torch.nn.CrossEntropyLoss
-  params:
-    reduction: mean
 
 optimizer:
   class: torch.optim.Adam
