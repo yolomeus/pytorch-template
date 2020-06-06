@@ -2,6 +2,7 @@ import gzip
 
 import numpy as np
 import torch
+from hydra.utils import to_absolute_path
 from torch.utils.data import Dataset
 
 
@@ -16,6 +17,10 @@ class FashionMNIST(Dataset):
         :param label_path: path to label file (assumed to be in .gz format)
         :param autoencoder_mode:  return inputs as labels if true.
         """
+
+        # treat the paths as relative to the original working dir, not the hydra dir
+        img_path, label_path = to_absolute_path(img_path), to_absolute_path(label_path)
+
         self.autoencoder_mode = autoencoder_mode
         self.images, self.labels = self.load_mnist(img_path, label_path)
         self.images = torch.as_tensor(self.images, dtype=torch.float) / 255.0

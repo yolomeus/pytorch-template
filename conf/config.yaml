@@ -11,7 +11,7 @@ training:
   batch_size: 32
 
 testing:
-  checkpoint: 'outputs\2020-06-06\15-28-36\lightning_logs\version_0\checkpoints\epoch=9.ckpt'
+  checkpoint: 'outputs/2020-06-06/17-51-15/lightning_logs/version_0/checkpoints/epoch=9.ckpt'
   batch_size: 512
   epochs: 1
 
