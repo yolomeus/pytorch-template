@@ -15,10 +15,15 @@ class LightningModel(LightningModule):
         :param hparams: contains model hyperparameters and training settings.
         """
         super().__init__()
+
+        # when loading from a PL checkpoint, hparams is a dict
+        if not isinstance(hparams, DictConfig):
+            hparams = DictConfig(hparams)
         self.hparams = OmegaConf.to_container(hparams, resolve=True)
 
         self.model = instantiate(hparams.model)
         self.loss = instantiate(hparams.loss)
+        # we pass the model parameters to the optimizer's constructor
         self.optimizer = instantiate(hparams.optimizer, self.model.parameters())
 
         self.metrics = [instantiate(metric) for metric in hparams.metrics]
@@ -66,7 +71,7 @@ class LightningModel(LightningModule):
 
         logs = {f'{prefix}_' + self._classname(metric): metric(y_pred, y_true) for metric in self.metrics}
         loss = self.loss(y_pred, y_true)
-        logs[f'{prefix}_loss'] = loss
+        logs[f'{prefix}_loss'] = loss.item()
 
         return {'log': logs}
 
@@ -90,7 +95,7 @@ class LightningModel(LightningModule):
         train_ds = instantiate(self.dataset_conf.test)
         test_dl = DataLoader(train_ds,
                              test_conf.batch_size,
-                             num_workers=self.hparams.num_workers)
+                             num_workers=self.hparams['num_workers'])
         return test_dl
 
     def configure_optimizers(self):
