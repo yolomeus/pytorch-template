@@ -26,3 +26,6 @@ optimizer:
 metrics:
   - accuracy:
     class: metrics.Accuracy
+
+  - f1:
+    class: metrics.F1Score
