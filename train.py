@@ -1,8 +1,6 @@
 import hydra
-import numpy as np
-import torch
 from omegaconf import DictConfig
-from pytorch_lightning import Trainer
+from pytorch_lightning import Trainer, seed_everything
 
 from lightning_wrapper import LightningModel
 
@@ -11,11 +9,10 @@ from lightning_wrapper import LightningModel
 def train(cfg: DictConfig):
     """Train a pytorch model specified by the config file"""
 
-    torch.manual_seed(cfg.random_seed)
-    np.random.seed(cfg.random_seed)
+    seed_everything(cfg.random_seed)
 
     model = LightningModel(cfg)
-    trainer = Trainer(max_epochs=cfg.training.epochs, gpus=cfg.gpus)
+    trainer = Trainer(max_epochs=cfg.training.epochs, gpus=cfg.gpus, deterministic=True)
     trainer.fit(model)
 
 
