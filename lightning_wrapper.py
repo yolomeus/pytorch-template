@@ -71,7 +71,10 @@ class LightningModel(LightningModule):
 
         logs = {f'{prefix}_' + self._classname(metric): metric(y_pred, y_true) for metric in self.metrics}
         loss = self.loss(y_pred, y_true)
-        logs[f'{prefix}_loss'] = loss.item()
+        # when testing we want to log a scalar and not a tensor
+        if prefix == 'test':
+            loss = loss.item()
+        logs[f'{prefix}_loss'] = loss
 
         return {'log': logs}
 
