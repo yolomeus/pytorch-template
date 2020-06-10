@@ -2,8 +2,8 @@ defaults:
   - model: mlp
   - dataset: fashion_mnist
 
-gpus: 1
-num_workers: 0
+gpus: 0
+num_workers: 4
 random_seed: 1590258941
 
 training:
@@ -11,7 +11,7 @@ training:
   batch_size: 32
 
 testing:
-  checkpoint: 'outputs/2020-06-06/17-51-15/lightning_logs/version_0/checkpoints/epoch=9.ckpt'
+  checkpoint: 'outputs/2020-06-10/18-52-06/lightning_logs/version_0/checkpoints/epoch=2.ckpt'
   batch_size: 512
   epochs: 1
 
