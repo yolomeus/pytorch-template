@@ -25,7 +25,10 @@ class SklearnMetric(Metric, ABC):
     """
 
     def __call__(self, y_pred: Tensor, y_true: Tensor):
-        y_pred = torch.softmax(y_pred, dim=-1).argmax(dim=-1)
+        if y_pred.shape[-1] == 1:
+            y_pred = torch.round(torch.sigmoid(y_pred))
+        else:
+            y_pred = torch.softmax(y_pred, dim=-1).argmax(dim=-1)
         return self._compute(y_pred, y_true)
 
 
