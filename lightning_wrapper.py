@@ -112,7 +112,16 @@ class LightningModel(LightningModule):
         :param outputs: a list of output dicts.
         :return: the concatenation of all output dict values at key.
         """
-        return torch.cat(list(map(lambda x: x[key], outputs)))
+
+        outs_at_key = list(map(lambda x: x[key], outputs))
+        # we assume a dict of outputs if the elements aren't tensors
+        if isinstance(outs_at_key[0], dict):
+            total_outs = {key: torch.cat([outs[key] for outs in outs_at_key])
+                          for key in outs_at_key[0].keys()}
+
+            return total_outs
+
+        return torch.cat(outs_at_key)
 
     @staticmethod
     def _classname(obj, lower=True):
