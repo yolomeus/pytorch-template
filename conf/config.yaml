@@ -9,6 +9,10 @@ random_seed: 1590258941
 training:
   epochs: 10
   batch_size: 32
+  # checkpointing
+  save_ckpts: 5
+  monitor: val_accuracy
+  mode: max
 
 testing:
   checkpoint: 'outputs/2020-06-10/18-52-06/lightning_logs/version_0/checkpoints/epoch=2.ckpt'
