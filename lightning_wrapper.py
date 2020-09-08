@@ -5,6 +5,7 @@ from pytorch_lightning import LightningModule
 from torch.utils.data import DataLoader
 
 
+# noinspection PyAbstractClass
 class LightningModel(LightningModule):
     """General model wrapper for training pytorch models using the pytorch-lightning library. This class is responsible
     for configuring the whole training and evaluation process.
@@ -16,10 +17,7 @@ class LightningModel(LightningModule):
         """
         super().__init__()
 
-        # when loading from a PL checkpoint, hparams is a dict
-        if not isinstance(hparams, DictConfig):
-            hparams = DictConfig(hparams)
-        self.hparams = OmegaConf.to_container(hparams, resolve=True)
+        self.hparams = hparams
 
         self.model = instantiate(hparams.model)
         self.loss = instantiate(hparams.loss)
