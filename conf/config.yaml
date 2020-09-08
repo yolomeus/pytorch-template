@@ -20,16 +20,12 @@ testing:
   epochs: 1
 
 loss:
-  class: torch.nn.CrossEntropyLoss
+  _target_: torch.nn.CrossEntropyLoss
 
 optimizer:
-  class: torch.optim.Adam
-  params:
-    lr: 1e-3
+  _target_: torch.optim.Adam
+  lr: 1e-3
 
 metrics:
-  - accuracy:
-    class: metrics.Accuracy
-
-  - f1:
-    class: metrics.F1Score
+  - _target_: metrics.Accuracy
+  - _target_: metrics.F1Score

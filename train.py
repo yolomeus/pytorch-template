@@ -6,7 +6,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from lightning_wrapper import LightningModel
 
 
-@hydra.main(config_path='conf/config.yaml')
+@hydra.main(config_path='conf', config_name='config')
 def train(cfg: DictConfig):
     """Train a pytorch model specified by the config file"""
 
