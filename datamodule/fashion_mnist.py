@@ -82,9 +82,11 @@ class FashionMNISTDataModule(DefaultDataModule):
         test_label_path = _data_dir(self.test_label_file)
 
         train_images, train_labels = self.load_mnist(train_img_path, train_label_path)
-        self.train_images, self.val_images, self.train_labels, self.val_labels = train_test_split(train_images,
-                                                                                                  train_labels,
-                                                                                                  test_size=self.val_size)
+        self.train_images, self.val_images, self.train_labels, self.val_labels = train_test_split(
+            train_images,
+            train_labels,
+            test_size=self.val_size
+        )
         self.test_images, self.test_labels = self.load_mnist(test_img_path, test_label_path)
 
     @staticmethod
