@@ -1,4 +1,5 @@
 import hydra
+from hydra.utils import instantiate
 from omegaconf import DictConfig
 from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.callbacks import ModelCheckpoint
@@ -23,7 +24,13 @@ def train(cfg: DictConfig):
                       gpus=cfg.gpus,
                       deterministic=True,
                       checkpoint_callback=checkpoint_callback)
-    trainer.fit(model)
+
+    datamodule = instantiate(cfg.datamodule,
+                             train_conf=cfg.training,
+                             test_conf=cfg.testing,
+                             num_workers=cfg.num_workers)
+
+    trainer.fit(model, datamodule=datamodule)
 
 
 if __name__ == '__main__':

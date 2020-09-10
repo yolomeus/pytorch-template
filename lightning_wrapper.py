@@ -26,10 +26,6 @@ class LightningModel(LightningModule):
 
         self.metrics = [instantiate(metric) for metric in hparams.metrics]
 
-        self.dataset_conf = hparams.dataset
-        self.train_conf = hparams.training
-        self.test_conf = hparams.testing
-
     def forward(self, inputs):
         return self.model(inputs)
 
@@ -75,29 +71,6 @@ class LightningModel(LightningModule):
         logs[f'{prefix}_loss'] = loss
 
         return {'log': logs}
-
-    def train_dataloader(self):
-        train_ds = instantiate(self.dataset_conf.train)
-        train_dl = DataLoader(train_ds,
-                              self.train_conf.batch_size,
-                              shuffle=True,
-                              num_workers=self.hparams['num_workers'])
-        return train_dl
-
-    def val_dataloader(self):
-        val_ds = instantiate(self.dataset_conf.validation)
-        val_dl = DataLoader(val_ds,
-                            self.test_conf.batch_size,
-                            num_workers=self.hparams['num_workers'])
-        return val_dl
-
-    def test_dataloader(self):
-        test_conf = self.test_conf
-        test_ds = instantiate(self.dataset_conf.test)
-        test_dl = DataLoader(test_ds,
-                             test_conf.batch_size,
-                             num_workers=self.hparams['num_workers'])
-        return test_dl
 
     def configure_optimizers(self):
         return self.optimizer

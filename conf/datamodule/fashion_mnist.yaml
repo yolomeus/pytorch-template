@@ -1,0 +1,14 @@
+# @package datamodule
+_target_: datamodule.fashion_mnist.FashionMNISTDataModule
+
+download: False
+download_base_path: http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/
+data_dir: data/fashion_mnist
+
+val_size: 0.2
+
+train_img_file: train-images-idx3-ubyte.gz
+train_label_file: train-labels-idx1-ubyte.gz
+
+test_img_file: t10k-images-idx3-ubyte.gz
+test_label_file: t10k-labels-idx1-ubyte.gz
