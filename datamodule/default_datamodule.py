@@ -1,6 +1,5 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
-from hydra.utils import instantiate
 from pytorch_lightning import LightningDataModule
 from torch.utils.data import DataLoader
 

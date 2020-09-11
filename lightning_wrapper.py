@@ -1,8 +1,7 @@
 import torch
 from hydra.utils import instantiate
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import DictConfig
 from pytorch_lightning import LightningModule
-from torch.utils.data import DataLoader
 
 
 # noinspection PyAbstractClass
