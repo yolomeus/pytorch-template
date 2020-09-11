@@ -7,12 +7,13 @@ num_workers: 4
 random_seed: 1590258941
 
 training:
-  epochs: 10
+  epochs: 100
   batch_size: 32
   # checkpointing
   save_ckpts: 5
-  monitor: val_accuracy
-  mode: max
+  monitor: val_loss
+  mode: min
+  patience: 20
 
 testing:
   checkpoint: 'outputs/2020-09-08/19-59-55/lightning_logs/version_0/checkpoints/epoch=9.ckpt'
