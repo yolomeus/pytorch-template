@@ -2,6 +2,8 @@ import gzip
 import os
 from dataclasses import dataclass
 from typing import Optional
+from urllib.parse import urljoin
+from urllib.request import urlretrieve
 
 import numpy as np
 import torch
@@ -13,6 +15,7 @@ from torch.utils.data import Dataset
 from datamodule.default_datamodule import DefaultDataModule
 
 
+# noinspection PyAbstractClass
 class FashionMNISTDataModule(DefaultDataModule):
     """DataModule for the fashion MNIST dataset.
     """
@@ -33,7 +36,8 @@ class FashionMNISTDataModule(DefaultDataModule):
 
         self.download = download
         self.download_base_path = download_base_path
-        self.data_dir = data_dir
+        self.data_dir = to_absolute_path(data_dir)
+
         self.train_img_file = train_img_file
         self.train_label_file = train_label_file
         self.test_img_file = test_img_file
@@ -52,27 +56,29 @@ class FashionMNISTDataModule(DefaultDataModule):
 
     @property
     def train_ds(self):
-        assert (self.train_images is not None and self.train_labels is not None)
         return FashionMNIST(self.train_images, self.train_labels)
 
     @property
     def val_ds(self):
-        assert (self.val_images is not None and self.test_labels is not None)
         return FashionMNIST(self.val_images, self.val_labels)
 
     @property
     def test_ds(self):
-        assert (self.test_images is not None and self.test_labels is not None)
         return FashionMNIST(self.test_images, self.test_labels)
 
     def prepare_data(self, *args, **kwargs):
         if self.download:
-            # TODO download ...
-            pass
+            os.makedirs(self.data_dir, exist_ok=True)
+            for filename in [self.train_img_file, self.test_img_file, self.train_label_file, self.test_label_file]:
+                downloaded_file = os.path.join(self.data_dir, filename)
+                if not os.path.exists(downloaded_file):
+                    print(f'downloading {filename}...')
+                    full_url = urljoin(self.download_base_path, filename)
+                    urlretrieve(full_url, downloaded_file)
 
     def setup(self, stage: Optional[str] = None):
         def _data_dir(filename):
-            return to_absolute_path(os.path.join(self.data_dir, filename))
+            return os.path.join(self.data_dir, filename)
 
         # val train split
         train_img_path = _data_dir(self.train_img_file)
