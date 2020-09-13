@@ -2,7 +2,7 @@ defaults:
   - model: mlp
   - datamodule: fashion_mnist
 
-gpus: 0
+gpus: 1
 num_workers: 4
 random_seed: 1590258941
 
@@ -21,9 +21,10 @@ testing:
   batch_size: 512
   epochs: 1
 
+metric_module: pytorch_lightning.metrics.classification
 metrics:
-  - _target_: metrics.Accuracy
-  - _target_: metrics.F1Score
+  - _target_: ${metric_module}.Accuracy
+  - _target_: ${metric_module}.F1
 
 hydra:
   run:
