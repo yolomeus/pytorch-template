@@ -13,19 +13,12 @@ training:
   save_ckpts: 5
   monitor: val_loss
   mode: min
-  patience: 20
+  patience: 5
 
 testing:
   checkpoint: 'outputs/2020-09-08/19-59-55/lightning_logs/version_0/checkpoints/epoch=9.ckpt'
   batch_size: 512
   epochs: 1
-
-loss:
-  _target_: torch.nn.CrossEntropyLoss
-
-optimizer:
-  _target_: torch.optim.Adam
-  lr: 1e-3
 
 metrics:
   - _target_: metrics.Accuracy

@@ -4,8 +4,6 @@ from omegaconf import DictConfig
 from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 
-from lightning_wrapper import LightningModel
-
 
 @hydra.main(config_path='conf', config_name='config')
 def train(cfg: DictConfig):
@@ -13,7 +11,7 @@ def train(cfg: DictConfig):
 
     seed_everything(cfg.random_seed)
 
-    model = LightningModel(cfg)
+    model = instantiate(cfg.model, hparams=cfg)
 
     train_cfg = cfg.training
     model_checkpoint = ModelCheckpoint(save_top_k=train_cfg.save_ckpts,

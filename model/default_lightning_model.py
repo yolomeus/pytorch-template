@@ -5,32 +5,29 @@ from pytorch_lightning import LightningModule
 
 
 # noinspection PyAbstractClass
-class LightningModel(LightningModule):
-    """General model wrapper for training pytorch models using the pytorch-lightning library. This class is responsible
-    for configuring the whole training and evaluation process.
+class DefaultLightningModel(LightningModule):
+    """Default pytorch-lightning model for models with a single loss and optimizer.
     """
 
-    def __init__(self, hparams: DictConfig):
+    def __init__(self, loss: DictConfig, optimizer: DictConfig, hparams: DictConfig):
         """
-        :param hparams: contains model hyperparameters and training settings.
+        :param loss: configuration for the loss object.
+        :param optimizer: configuration for the optimizer object.
+        :param hparams: contains all hyperparameters.
         """
         super().__init__()
 
-        self.hparams = hparams
-
-        self.model = instantiate(hparams.model)
-        self.loss = instantiate(hparams.loss)
-        # we pass the model parameters to the optimizer's constructor
-        self.optimizer = instantiate(hparams.optimizer, self.model.parameters())
-
-        self.metrics = [instantiate(metric) for metric in hparams.metrics]
+        self.save_hyperparameters(hparams)
+        self.metrics = [] if hparams.metrics is None else [instantiate(metric) for metric in hparams.metrics]
+        self.loss = instantiate(loss)
+        self.optimizer_cfg = optimizer
 
     def forward(self, inputs):
-        return self.model(inputs)
+        return self(inputs)
 
     def training_step(self, batch, batch_idx):
         x, y_true = batch
-        y_pred = self.model(x)
+        y_pred = self(x)
         loss = self.loss(y_pred, y_true)
 
         logs = {'batch_loss': loss}
@@ -38,7 +35,7 @@ class LightningModel(LightningModule):
 
     def validation_step(self, batch, batch_idx):
         x, y_true = batch
-        y_pred = self.model(x)
+        y_pred = self(x)
         return {'y_pred': y_pred, 'y_true': y_true}
 
     def test_step(self, batch, batch_idx):
@@ -72,7 +69,7 @@ class LightningModel(LightningModule):
         return {'log': logs}
 
     def configure_optimizers(self):
-        return self.optimizer
+        return instantiate(self.optimizer_cfg, self.parameters())
 
     @staticmethod
     def _unpack_outputs(key, outputs):
