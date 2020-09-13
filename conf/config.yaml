@@ -16,10 +16,15 @@ training:
   patience: 5
 
 testing:
-  checkpoint: 'outputs/2020-09-08/19-59-55/lightning_logs/version_0/checkpoints/epoch=9.ckpt'
+  checkpoint_dir: 'outputs/2020-09-13/13-51-45/checkpoints'
+  test_best_k: 5
   batch_size: 512
   epochs: 1
 
 metrics:
   - _target_: metrics.Accuracy
   - _target_: metrics.F1Score
+
+hydra:
+  run:
+    dir: ./outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}

@@ -1,3 +1,5 @@
+import os
+
 import hydra
 from hydra.utils import instantiate
 from omegaconf import DictConfig
@@ -14,10 +16,13 @@ def train(cfg: DictConfig):
     model = instantiate(cfg.model, hparams=cfg)
 
     train_cfg = cfg.training
+
+    ckpt_path = os.path.join(os.getcwd(), 'checkpoints/{epoch:03d}-{' + train_cfg.monitor + ':.3f}')
     model_checkpoint = ModelCheckpoint(save_top_k=train_cfg.save_ckpts,
                                        monitor=train_cfg.monitor,
                                        mode=train_cfg.mode,
-                                       verbose=True)
+                                       verbose=True,
+                                       filepath=ckpt_path)
 
     early_stopping = EarlyStopping(monitor=train_cfg.monitor,
                                    patience=train_cfg.patience,
