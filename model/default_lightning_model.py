@@ -21,8 +21,8 @@ class DefaultLightningModel(LightningModule):
         self.loss = instantiate(loss)
         self.optimizer_cfg = optimizer
 
-    def forward(self, inputs):
-        return self(inputs)
+    def configure_optimizers(self):
+        return instantiate(self.optimizer_cfg, self.parameters())
 
     def training_step(self, batch, batch_idx):
         x, y_true = batch
@@ -66,9 +66,6 @@ class DefaultLightningModel(LightningModule):
         logs[f'{prefix}_loss'] = loss
 
         return {'log': logs}
-
-    def configure_optimizers(self):
-        return instantiate(self.optimizer_cfg, self.parameters())
 
     @staticmethod
     def _unpack_outputs(key, outputs):
