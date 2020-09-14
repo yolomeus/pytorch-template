@@ -17,7 +17,6 @@ class DefaultLightningModel(LightningModule):
         """
         super().__init__()
 
-        self.save_hyperparameters(hparams)
         self.metrics = [] if hparams.metrics is None else [instantiate(metric) for metric in hparams.metrics]
         self.loss = instantiate(loss)
         self.optimizer_cfg = optimizer

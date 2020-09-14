@@ -21,6 +21,7 @@ class MLP(DefaultLightningModel):
                                      ReLU(),
                                      Dropout(dropout),
                                      Linear(h_dim, out_dim))
+        self.save_hyperparameters()
 
     def forward(self, inputs):
         x = self.classifier(inputs)
