@@ -2,7 +2,7 @@
 _target_: datamodule.fashion_mnist.FashionMNISTDataModule
 
 download: True
-download_base_path: http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/
+download_base_url: http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/
 data_dir: data/fashion_mnist
 
 val_size: 0.2
