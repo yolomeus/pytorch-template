@@ -5,14 +5,25 @@ from model.default_lightning_model import DefaultLightningModel
 
 
 class MLP(DefaultLightningModel):
-    """Simple Multi-Layer Perceptron also known as Feed Forward Neural Network."""
+    """Simple Multi-Layer Perceptron also known as Feed-Forward Neural Network."""
 
-    def __init__(self, in_dim, h_dim, out_dim, dropout, loss: DictConfig, optimizer: DictConfig, hparams: DictConfig):
-        """Builds the MLP
+    def __init__(self,
+                 in_dim: int,
+                 h_dim: int,
+                 out_dim: int,
+                 dropout: float,
+                 loss: DictConfig,
+                 optimizer: DictConfig,
+                 hparams: DictConfig):
+        """
 
-        :param in_dim: dimension of the input vectors.
-        :param h_dim: hidden dimension.
-        :param out_dim: output dimension.
+        :param in_dim: input dimension
+        :param h_dim: hidden dimension
+        :param out_dim: output dimension
+        :param dropout: dropout rate
+        :param loss: config object representing loss.
+        :param optimizer: config object representing optimizer.
+        :param hparams: all hyperparameters.
         """
 
         super().__init__(loss, optimizer, hparams)
