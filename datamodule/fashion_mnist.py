@@ -8,6 +8,7 @@ from urllib.request import urlretrieve
 import numpy as np
 import torch
 from hydra.utils import to_absolute_path
+from omegaconf import DictConfig
 from sklearn.model_selection import train_test_split
 from torch import Tensor
 from torch.utils.data import Dataset
@@ -21,21 +22,35 @@ class FashionMNISTDataModule(DefaultDataModule):
     """
 
     def __init__(self,
-                 download,
-                 download_base_path,
-                 data_dir,
-                 train_img_file,
-                 train_label_file,
-                 test_img_file,
-                 test_label_file,
-                 val_size,
-                 train_conf,
-                 test_conf,
-                 num_workers):
+                 download: bool,
+                 download_base_url: str,
+                 data_dir: str,
+                 train_img_file: str,
+                 train_label_file: str,
+                 test_img_file: str,
+                 test_label_file: str,
+                 val_size: float,
+                 train_conf: DictConfig,
+                 test_conf: DictConfig,
+                 num_workers: int):
+        """
+
+        :param download: whether to download the dataset or not. Only downloads if files aren't  present already.
+        :param download_base_url:  url where to download the files (without filename).
+        :param data_dir: directory where to download files to and read from.
+        :param train_img_file: file containing the training images.
+        :param train_label_file: file containing the training labels.
+        :param test_img_file: file containing the test images.
+        :param test_label_file: file containing the test labels.
+        :param val_size: percentage of the train set to use for validation e.g. 0.2 for 20%.
+        :param train_conf: training configuration.
+        :param test_conf: testing configuration
+        :param num_workers: number of workers for dataloaders to use.
+        """
         super().__init__(train_conf, test_conf, num_workers)
 
         self.download = download
-        self.download_base_path = download_base_path
+        self.download_base_url = download_base_url
         self.data_dir = to_absolute_path(data_dir)
 
         self.train_img_file = train_img_file
@@ -73,7 +88,7 @@ class FashionMNISTDataModule(DefaultDataModule):
                 downloaded_file = os.path.join(self.data_dir, filename)
                 if not os.path.exists(downloaded_file):
                     print(f'downloading {filename}...')
-                    full_url = urljoin(self.download_base_path, filename)
+                    full_url = urljoin(self.download_base_url, filename)
                     urlretrieve(full_url, downloaded_file)
 
     def setup(self, stage: Optional[str] = None):
@@ -124,7 +139,7 @@ class FashionMNIST(Dataset):
     labels: Tensor
     autoencoder_mode: bool = False
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int):
         if self.autoencoder_mode:
             return self.images[index], self.images[index]
         return self.images[index], self.labels[index]
