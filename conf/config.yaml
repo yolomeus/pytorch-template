@@ -16,16 +16,15 @@ training:
   patience: 5
 
 testing:
-  checkpoint_dir: 'outputs/2020-09-13/13-51-45/checkpoints'
-  test_best_k: 5
+  ckpt_dir: 'outputs/model.mlp.MLP/2020-09-13/20-31-16/checkpoints/'
+  test_best_k: 3
   batch_size: 512
-  epochs: 1
 
-metric_module: pytorch_lightning.metrics.classification
+# metric_module: pytorch_lightning.metrics.classification
 metrics:
-  - _target_: ${metric_module}.Accuracy
-  - _target_: ${metric_module}.F1
+  - _target_: pytorch_lightning.metrics.classification.Accuracy
+  - _target_: pytorch_lightning.metrics.classification.F1
 
 hydra:
   run:
-    dir: ./outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    dir: ./outputs/${model._target_}/${now:%Y-%m-%d}/${now:%H-%M-%S}
