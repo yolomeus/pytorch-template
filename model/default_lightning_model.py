@@ -1,11 +1,13 @@
+import math
+from abc import ABC
+
 import torch
 from hydra.utils import instantiate
 from omegaconf import DictConfig
 from pytorch_lightning import LightningModule
 
 
-# noinspection PyAbstractClass
-class DefaultLightningModel(LightningModule):
+class DefaultLightningModel(LightningModule, ABC):
     """Default pytorch-lightning model for models with a single loss and optimizer.
     """
 
@@ -65,6 +67,7 @@ class DefaultLightningModel(LightningModule):
             loss = loss.item()
         logs[f'{prefix}_loss'] = loss
 
+        self._wandb_log(logs)
         return {'log': logs}
 
     @staticmethod
@@ -96,3 +99,41 @@ class DefaultLightningModel(LightningModule):
         """
         name = obj.__class__.__name__
         return name.lower() if lower else name
+
+
+class DefaultWandbModel(DefaultLightningModel, ABC):
+    """Lightning default model extended with wandb logging.
+    """
+
+    def __init__(self, loss: DictConfig, optimizer: DictConfig, hparams: DictConfig):
+        super().__init__(loss, optimizer, hparams)
+        self.logs_initialized = False
+
+    def _init_logs(self):
+        """initialize min and max values in wandb logger summary.
+        """
+        summary = self.logger.experiment.summary
+        if not self.logs_initialized:
+            for split in ['val', 'train', 'test']:
+                for metric in self.metrics:
+                    name = self._classname(metric)
+                    summary[f'min_{split}_{name}'] = math.inf
+                    summary[f'max_{split}_{name}'] = -math.inf
+
+                summary[f'min_{split}_loss'] = math.inf
+                summary[f'max_{split}_loss'] = -math.inf
+
+            self.logs_initialized = True
+
+    def _wandb_log(self, logs: dict):
+        """for each metric, log min and max values so far.
+
+        :param logs: dict containing log names and values.
+        """
+        if not self.logs_initialized:
+            self._init_logs()
+
+        summary = self.logger.experiment.summary
+        for name, val in logs.items():
+            summary[f'min_{name}'] = min(val, summary[f'min_{name}'])
+            summary[f'max_{name}'] = max(val, summary[f'max_{name}'])

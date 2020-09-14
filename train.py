@@ -5,6 +5,7 @@ from hydra.utils import instantiate
 from omegaconf import DictConfig
 from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
+from pytorch_lightning.loggers import WandbLogger
 
 
 @hydra.main(config_path='conf', config_name='config')
@@ -28,10 +29,11 @@ def train(cfg: DictConfig):
                                    patience=train_cfg.patience,
                                    mode=train_cfg.mode,
                                    verbose=True)
-
+    logger = WandbLogger()
     trainer = Trainer(max_epochs=train_cfg.epochs,
                       gpus=cfg.gpus,
                       deterministic=True,
+                      logger=logger,
                       checkpoint_callback=model_checkpoint,
                       early_stop_callback=early_stopping)
 
