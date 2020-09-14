@@ -3,11 +3,16 @@ import os
 import hydra
 from hydra.utils import get_class, to_absolute_path, instantiate
 from omegaconf import DictConfig
-from pytorch_lightning import seed_everything, Trainer
+from pytorch_lightning import seed_everything, Trainer, LightningDataModule
 
 
-def test_checkpoint(ckpt_path, test_cfg, trainer, datamodule):
+def test_checkpoint(ckpt_path: str, test_cfg: DictConfig, trainer: Trainer, datamodule: LightningDataModule):
     """Load model state from checkpoint and test it.
+
+    :param ckpt_path: path to the the checkpoint file.
+    :param test_cfg: test configuration.
+    :param trainer: trainer used for testing.
+    :param datamodule: datamodule to test on.
     """
 
     model_cls = get_class(test_cfg.model._target_)
