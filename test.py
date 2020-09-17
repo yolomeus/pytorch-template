@@ -4,6 +4,7 @@ import hydra
 from hydra.utils import get_class, to_absolute_path, instantiate
 from omegaconf import DictConfig
 from pytorch_lightning import seed_everything, Trainer, LightningDataModule
+from pytorch_lightning.loggers import WandbLogger
 
 
 def test_checkpoint(ckpt_path: str, test_cfg: DictConfig, trainer: Trainer, datamodule: LightningDataModule):
@@ -32,10 +33,11 @@ def test(cfg: DictConfig):
                              train_conf=cfg.training,
                              test_conf=cfg.testing,
                              num_workers=cfg.num_workers)
-    trainer = Trainer(gpus=cfg.gpus, deterministic=True)
 
-    ckpt_dir = to_absolute_path(cfg.testing.ckpt_dir)
+    trainer = Trainer(gpus=cfg.gpus, deterministic=True, logger=WandbLogger())
 
+    log_dir = to_absolute_path(cfg.testing.log_dir)
+    ckpt_dir = os.path.join(log_dir, 'checkpoints')
     for i, file in enumerate(reversed(os.listdir(ckpt_dir))):
         if i == cfg.testing.test_best_k:
             break
