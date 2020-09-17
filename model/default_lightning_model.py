@@ -66,8 +66,6 @@ class DefaultLightningModel(LightningModule, ABC):
         if prefix == 'test':
             loss = loss.item()
         logs[f'{prefix}_loss'] = loss
-
-        self._wandb_log(logs)
         return {'log': logs}
 
     @staticmethod
@@ -109,8 +107,21 @@ class DefaultWandbModel(DefaultLightningModel, ABC):
         super().__init__(loss, optimizer, hparams)
         self.logs_initialized = False
 
+    def _wandb_log(self, logs: dict):
+        """for each metric, log min and max values so far.
+
+        :param logs: dict containing log names and values.
+        """
+        if not self.logs_initialized:
+            self._init_logs()
+
+        summary = self.logger.experiment.summary
+        for name, val in logs.items():
+            summary[f'min_{name}'] = min(val, summary[f'min_{name}'])
+            summary[f'max_{name}'] = max(val, summary[f'max_{name}'])
+
     def _init_logs(self):
-        """initialize min and max values in wandb logger summary.
+        """initialize min and max values in wandb logger summary for metrics and loss.
         """
         summary = self.logger.experiment.summary
         if not self.logs_initialized:
@@ -125,15 +136,7 @@ class DefaultWandbModel(DefaultLightningModel, ABC):
 
             self.logs_initialized = True
 
-    def _wandb_log(self, logs: dict):
-        """for each metric, log min and max values so far.
-
-        :param logs: dict containing log names and values.
-        """
-        if not self.logs_initialized:
-            self._init_logs()
-
-        summary = self.logger.experiment.summary
-        for name, val in logs.items():
-            summary[f'min_{name}'] = min(val, summary[f'min_{name}'])
-            summary[f'max_{name}'] = max(val, summary[f'max_{name}'])
+    def _epoch_end(self, prefix, outputs):
+        log_dict = super(DefaultWandbModel, self)._epoch_end(prefix, outputs)
+        self._wandb_log(log_dict['log'])
+        return log_dict
