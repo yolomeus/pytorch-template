@@ -30,6 +30,8 @@ def train(cfg: DictConfig):
                                    mode=train_cfg.mode,
                                    verbose=True)
     logger = WandbLogger()
+    logger.experiment.watch(model)
+
     trainer = Trainer(max_epochs=train_cfg.epochs,
                       gpus=cfg.gpus,
                       deterministic=True,
