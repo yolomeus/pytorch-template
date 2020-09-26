@@ -130,13 +130,13 @@ class FashionMNISTDataModule(DefaultDataModule):
 class FashionMNIST(Dataset):
     """Dataset for loading Fashion MNIST from disk.
 
-    :param images: path to image dataset file (assumed to be in .gz format)
-    :param labels: path to label file (assumed to be in .gz format)
+    :param images: tensor containing images (num_images, channels, width, height).
+    :param labels: label tensor (num_images, 1).
     :param autoencoder_mode:  return inputs as labels if true.
     """
 
-    images: Tensor
-    labels: Tensor
+    images: Tensor[float]
+    labels: Tensor[int]
     autoencoder_mode: bool = False
 
     def __getitem__(self, index: int):
