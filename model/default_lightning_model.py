@@ -1,4 +1,3 @@
-import math
 from abc import ABC
 
 import torch
@@ -97,46 +96,3 @@ class DefaultLightningModel(LightningModule, ABC):
         """
         name = obj.__class__.__name__
         return name.lower() if lower else name
-
-
-class DefaultWandbModel(DefaultLightningModel, ABC):
-    """Lightning default model extended with wandb logging.
-    """
-
-    def __init__(self, loss: DictConfig, optimizer: DictConfig, hparams: DictConfig):
-        super().__init__(loss, optimizer, hparams)
-        self.logs_initialized = False
-
-    def _wandb_log(self, logs: dict):
-        """for each metric, log min and max values so far.
-
-        :param logs: dict containing log names and values.
-        """
-        if not self.logs_initialized:
-            self._init_logs()
-
-        summary = self.logger.experiment.summary
-        for name, val in logs.items():
-            summary[f'min_{name}'] = min(val, summary[f'min_{name}'])
-            summary[f'max_{name}'] = max(val, summary[f'max_{name}'])
-
-    def _init_logs(self):
-        """initialize min and max values in wandb logger summary for metrics and loss.
-        """
-        summary = self.logger.experiment.summary
-        if not self.logs_initialized:
-            for split in ['val', 'train', 'test']:
-                for metric in self.metrics:
-                    name = self._classname(metric)
-                    summary[f'min_{split}_{name}'] = math.inf
-                    summary[f'max_{split}_{name}'] = -math.inf
-
-                summary[f'min_{split}_loss'] = math.inf
-                summary[f'max_{split}_loss'] = -math.inf
-
-            self.logs_initialized = True
-
-    def _epoch_end(self, prefix, outputs):
-        log_dict = super(DefaultWandbModel, self)._epoch_end(prefix, outputs)
-        self._wandb_log(log_dict['log'])
-        return log_dict

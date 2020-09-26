@@ -1,10 +1,10 @@
 from omegaconf import DictConfig
 from torch.nn import Linear, ReLU, Sequential, Dropout
 
-from model.default_lightning_model import DefaultWandbModel
+from model.default_lightning_model import DefaultLightningModel
 
 
-class MLP(DefaultWandbModel):
+class MLP(DefaultLightningModel):
     """Simple Multi-Layer Perceptron also known as Feed-Forward Neural Network."""
 
     def __init__(self,
