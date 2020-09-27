@@ -1,6 +1,5 @@
 import gzip
 import os
-from dataclasses import dataclass
 from typing import Optional
 from urllib.parse import urljoin
 from urllib.request import urlretrieve
@@ -10,14 +9,12 @@ import torch
 from hydra.utils import to_absolute_path
 from omegaconf import DictConfig
 from sklearn.model_selection import train_test_split
-from torch import Tensor
-from torch.utils.data import Dataset
 
-from datamodule.default_datamodule import DefaultDataModule
+from datamodule import DatasetSplit
+from datamodule.default_datamodule import ClassificationDataModule
 
 
-# noinspection PyAbstractClass
-class FashionMNISTDataModule(DefaultDataModule):
+class FashionMNISTDataModule(ClassificationDataModule):
     """DataModule for the fashion MNIST dataset.
     """
 
@@ -69,17 +66,14 @@ class FashionMNISTDataModule(DefaultDataModule):
         self.test_images = None
         self.test_labels = None
 
-    @property
-    def train_ds(self):
-        return FashionMNIST(self.train_images, self.train_labels)
-
-    @property
-    def val_ds(self):
-        return FashionMNIST(self.val_images, self.val_labels)
-
-    @property
-    def test_ds(self):
-        return FashionMNIST(self.test_images, self.test_labels)
+    def get_instances_and_labels(self, split: DatasetSplit):
+        if split == DatasetSplit.TEST:
+            return self.test_images, self.test_labels
+        elif split == DatasetSplit.VALIDATION:
+            return self.val_images, self.val_labels
+        elif split == DatasetSplit.TRAIN:
+            return self.train_images, self.train_labels
+        raise NotImplementedError(f'Implementation for {split} does not exist.')
 
     def prepare_data(self, *args, **kwargs):
         if self.download:
@@ -124,25 +118,3 @@ class FashionMNISTDataModule(DefaultDataModule):
         labels = np.array(labels)
         # create writeable copy
         return torch.as_tensor(images, dtype=torch.float) / 255.0, torch.as_tensor(labels, dtype=torch.long)
-
-
-@dataclass
-class FashionMNIST(Dataset):
-    """Dataset for loading Fashion MNIST from disk.
-
-    :param images: tensor containing images (num_images, channels, width, height).
-    :param labels: label tensor (num_images, 1).
-    :param autoencoder_mode:  return inputs as labels if true.
-    """
-
-    images: Tensor[float]
-    labels: Tensor[int]
-    autoencoder_mode: bool = False
-
-    def __getitem__(self, index: int):
-        if self.autoencoder_mode:
-            return self.images[index], self.images[index]
-        return self.images[index], self.labels[index]
-
-    def __len__(self):
-        return len(self.images)
