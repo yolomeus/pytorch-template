@@ -14,6 +14,7 @@ from datamodule import DatasetSplit
 from datamodule.default_datamodule import ClassificationDataModule
 
 
+# noinspection PyAbstractClass
 class FashionMNISTDataModule(ClassificationDataModule):
     """DataModule for the fashion MNIST dataset.
     """
@@ -106,6 +107,12 @@ class FashionMNISTDataModule(ClassificationDataModule):
 
     @staticmethod
     def load_mnist(img_path, label_path):
+        """Helper for loading the fashion mnist dataset from disk.
+
+        :param img_path: path to image data.
+        :param label_path: path to label data.
+        :return: a tuple containing the images and labels tensors.
+        """
         with gzip.open(label_path, 'rb') as lbl_path:
             labels = np.frombuffer(lbl_path.read(), dtype=np.uint8,
                                    offset=8)
@@ -114,7 +121,7 @@ class FashionMNISTDataModule(ClassificationDataModule):
             images = np.frombuffer(img_path.read(), dtype=np.uint8,
                                    offset=16).reshape(len(labels), 784)
 
+        # create writeable copy
         images = np.array(images)
         labels = np.array(labels)
-        # create writeable copy
         return torch.as_tensor(images, dtype=torch.float) / 255.0, torch.as_tensor(labels, dtype=torch.long)
