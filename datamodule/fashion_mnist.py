@@ -66,7 +66,7 @@ class FashionMNISTDataModule(ClassificationDataModule):
         self.test_images = None
         self.test_labels = None
 
-    def get_instances_and_labels(self, split: DatasetSplit):
+    def prepare_instances_and_labels(self, split: DatasetSplit):
         if split == DatasetSplit.TEST:
             return self.test_images, self.test_labels
         elif split == DatasetSplit.VALIDATION:
