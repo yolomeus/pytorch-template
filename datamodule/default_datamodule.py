@@ -1,7 +1,9 @@
 from abc import abstractmethod
 
 from pytorch_lightning import LightningDataModule
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Dataset
+
+from datamodule import DatasetSplit
 
 
 class DefaultDataModule(LightningDataModule):
@@ -20,7 +22,7 @@ class DefaultDataModule(LightningDataModule):
     def train_ds(self):
         """Build the train pytorch dataset.
 
-        :return: the train pytorch dataset
+        :return: the train pytorch dataset.
         """
 
     @property
@@ -28,7 +30,7 @@ class DefaultDataModule(LightningDataModule):
     def val_ds(self):
         """Build the validation pytorch dataset.
 
-        :return: the validation pytorch dataset
+        :return: the validation pytorch dataset.
         """
 
     @property
@@ -36,7 +38,7 @@ class DefaultDataModule(LightningDataModule):
     def test_ds(self):
         """Build the test pytorch dataset.
 
-        :return: the test pytorch dataset
+        :return: the test pytorch dataset.
         """
 
     def train_dataloader(self):
@@ -57,3 +59,53 @@ class DefaultDataModule(LightningDataModule):
                              self.test_conf.batch_size,
                              num_workers=self.num_workers)
         return test_dl
+
+
+class ClassificationDataModule(DefaultDataModule):
+    """Datamodule for a standard classification setting with training instances and labels.
+    """
+
+    def __init__(self, train_conf, test_conf, num_workers):
+        super().__init__(train_conf, test_conf, num_workers)
+
+    def _create_dataset(self, split: DatasetSplit):
+        """Helper factory method for building a split specific pytorch dataset.
+
+        :param split: which split to build.
+        :return: the split specific pytorch dataset.
+        """
+        return self._ClassificationDataset(*self.get_instances_and_labels(split))
+
+    @property
+    def train_ds(self):
+        return self._create_dataset(DatasetSplit.TRAIN)
+
+    @property
+    def val_ds(self):
+        return self._create_dataset(DatasetSplit.VALIDATION)
+
+    @property
+    def test_ds(self):
+        return self._create_dataset(DatasetSplit.TEST)
+
+    @abstractmethod
+    def get_instances_and_labels(self, split: DatasetSplit):
+        """Get tuple of instances and labels for classification.
+
+        :param split: the dataset split use.
+        :return (tuple): instances and labels for a specific split.
+        """
+
+    class _ClassificationDataset(Dataset):
+        """Pytorch Dataset for standard classification setting.
+        """
+
+        def __init__(self, instances, labels):
+            self.instances = instances
+            self.labels = labels
+
+        def __getitem__(self, index):
+            return self.instances[index], self.labels[index]
+
+        def __len__(self):
+            return len(self.instances)
