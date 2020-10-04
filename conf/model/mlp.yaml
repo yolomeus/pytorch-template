@@ -1,10 +1,11 @@
-# @package model
-_target_: model.mlp.MLP
+# @package _global_
+model:
+  _target_: model.mlp.MLP
 
-in_dim: 784
-h_dim: 256
-out_dim: 10
-dropout: 0.2
+  in_dim: 784
+  h_dim: 256
+  out_dim: 10
+  dropout: 0.2
 
 loss:
   _target_: torch.nn.CrossEntropyLoss

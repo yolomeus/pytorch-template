@@ -9,28 +9,28 @@ from torch.nn import Module
 from datamodule import DatasetSplit
 
 
-class DefaultLightningModel(LightningModule, ABC):
-    """Default pytorch-lightning model for models with a single loss and optimizer.
+class DefaultTraining(LightningModule, ABC):
+    """Default Wrapper for training a pytorch module using pytorch-lightning.
     """
 
-    def __init__(self, loss: DictConfig, optimizer: DictConfig, hparams: DictConfig):
+    def __init__(self, hparams: DictConfig):
         """
-        :param loss: configuration for the loss object.
-        :param optimizer: configuration for the optimizer object.
         :param hparams: contains all hyperparameters.
         """
         super().__init__()
 
-        self.loss = instantiate(loss)
+        self.hparams = hparams
+        self.loss = instantiate(hparams.loss)
         self.metrics = Metrics(self.loss, hparams.metrics)
-        self.optimizer_cfg = optimizer
+        self.optimizer_cfg = hparams.optimizer
+        self.model = instantiate(hparams.model)
 
     def configure_optimizers(self):
         return instantiate(self.optimizer_cfg, self.parameters())
 
     def training_step(self, batch, batch_idx):
         x, y_true = batch
-        y_pred = self(x)
+        y_pred = self.model(x)
         loss = self.loss(y_pred, y_true)
 
         logs = {'batch_loss': loss}
@@ -38,7 +38,7 @@ class DefaultLightningModel(LightningModule, ABC):
 
     def validation_step(self, batch, batch_idx):
         x, y_true = batch
-        y_pred = self(x)
+        y_pred = self.model(x)
         return {'y_pred': y_pred, 'y_true': y_true}
 
     def test_step(self, batch, batch_idx):

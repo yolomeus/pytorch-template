@@ -1,20 +1,14 @@
-from omegaconf import DictConfig
-from torch.nn import Linear, ReLU, Sequential, Dropout
-
-from model.default_lightning_model import DefaultLightningModel
+from torch.nn import Linear, ReLU, Sequential, Dropout, Module
 
 
-class MLP(DefaultLightningModel):
+class MLP(Module):
     """Simple Multi-Layer Perceptron also known as Feed-Forward Neural Network."""
 
     def __init__(self,
                  in_dim: int,
                  h_dim: int,
                  out_dim: int,
-                 dropout: float,
-                 loss: DictConfig,
-                 optimizer: DictConfig,
-                 hparams: DictConfig):
+                 dropout: float):
         """
 
         :param in_dim: input dimension
@@ -26,13 +20,12 @@ class MLP(DefaultLightningModel):
         :param hparams: all hyperparameters.
         """
 
-        super().__init__(loss, optimizer, hparams)
+        super().__init__()
         self.classifier = Sequential(Dropout(dropout),
                                      Linear(in_dim, h_dim),
                                      ReLU(),
                                      Dropout(dropout),
                                      Linear(h_dim, out_dim))
-        self.save_hyperparameters()
 
     def forward(self, inputs):
         x = self.classifier(inputs)
