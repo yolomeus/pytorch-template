@@ -10,7 +10,8 @@ from datamodule import DatasetSplit
 
 
 class DefaultTraining(LightningModule, ABC):
-    """Default Wrapper for training a pytorch module using pytorch-lightning.
+    """Default Wrapper for training a pytorch module using pytorch-lightning. Assumes a standard classification task
+    with instance-label pairs (x, y) and a loss function that has the signature loss(y_pred, y_true).
     """
 
     def __init__(self, hparams: DictConfig):
