@@ -1,9 +1,9 @@
-from enum import Enum, auto
+from enum import Enum
 
 
 class DatasetSplit(Enum):
     """Enum for train, validation and test split.
     """
-    TRAIN = auto()
-    VALIDATION = auto()
-    TEST = auto()
+    TRAIN = 'train'
+    VALIDATION = 'val'
+    TEST = 'test'
