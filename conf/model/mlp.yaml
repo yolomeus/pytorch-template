@@ -13,3 +13,6 @@ loss:
 optimizer:
   _target_: torch.optim.Adam
   lr: 1e-3
+
+loop:
+  _target_: loop.DefaultLoop

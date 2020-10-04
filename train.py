@@ -7,7 +7,6 @@ from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 
 from loggers import WandbBoundLogger
-from model.default_lightning_model import DefaultTraining
 
 
 @hydra.main(config_path='conf', config_name='config')
@@ -16,7 +15,7 @@ def train(cfg: DictConfig):
 
     seed_everything(cfg.random_seed)
 
-    training = DefaultTraining(cfg)
+    training = instantiate(cfg.loop, cfg)
 
     train_cfg = cfg.training
     ckpt_path = os.path.join(os.getcwd(), 'checkpoints/{epoch:03d}-{' + train_cfg.monitor + ':.3f}')
