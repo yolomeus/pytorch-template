@@ -6,7 +6,7 @@ from omegaconf import DictConfig
 from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 
-from loggers import WandbBoundLogger
+from logging.loggers import WandbBoundLogger
 
 
 @hydra.main(config_path='conf', config_name='config')
