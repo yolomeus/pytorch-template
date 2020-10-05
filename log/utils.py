@@ -9,7 +9,7 @@ from datamodule import DatasetSplit
 
 
 class Metrics:
-    """Stores and manages metrics during training/testing for logging.
+    """Stores and manages metrics during training/testing for log.
     """
 
     def __init__(self, loss: Module, metrics_config: DictConfig):

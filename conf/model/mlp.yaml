@@ -15,4 +15,4 @@ optimizer:
   lr: 1e-3
 
 loop:
-  _target_: loop.DefaultLoop
+  _target_: loop.DefaultClassificationLoop

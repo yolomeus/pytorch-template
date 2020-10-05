@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader, Dataset
 from datamodule import DatasetSplit
 
 
-class DefaultDataModule(LightningDataModule):
+class AbstractDefaultDataModule(LightningDataModule):
     """Base class for pytorch-lightning DataModule datasets. Subclass this if you have a standard train, validation,
     test split."""
 
@@ -61,7 +61,7 @@ class DefaultDataModule(LightningDataModule):
         return test_dl
 
 
-class ClassificationDataModule(DefaultDataModule):
+class ClassificationDataModuleAbstract(AbstractDefaultDataModule):
     """Datamodule for a standard classification setting with training instances and labels.
     """
 

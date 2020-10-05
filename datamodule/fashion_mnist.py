@@ -11,11 +11,11 @@ from omegaconf import DictConfig
 from sklearn.model_selection import train_test_split
 
 from datamodule import DatasetSplit
-from datamodule.default_datamodule import ClassificationDataModule
+from datamodule.default_datamodule import ClassificationDataModuleAbstract
 
 
 # noinspection PyAbstractClass
-class FashionMNISTDataModule(ClassificationDataModule):
+class FashionMNISTDataModule(ClassificationDataModuleAbstract):
     """DataModule for the fashion MNIST dataset.
     """
 
