@@ -9,25 +9,32 @@ from torch.nn import Module
 from datamodule import DatasetSplit
 
 
-class DefaultLoop(LightningModule, ABC):
-    """Default Wrapper for training a pytorch module using pytorch-lightning. Assumes a standard classification task
-    with instance-label pairs (x, y) and a loss function that has the signature loss(y_pred, y_true).
+class AbstractBaseLoop(LightningModule, ABC):
+    """Abstract base class for implementing a training loop for a pytorch model.
+    """
+
+    def __init__(self, hparams: DictConfig):
+        super().__init__()
+        self.save_hyperparameters(hparams)
+
+
+class DefaultClassificationLoop(AbstractBaseLoop, ABC):
+    """Default wrapper for training/testing a pytorch module using pytorch-lightning. Assumes a standard classification
+    task with instance-label pairs (x, y) and a loss function that has the signature loss(y_pred, y_true).
     """
 
     def __init__(self, hparams: DictConfig):
         """
         :param hparams: contains all hyperparameters.
         """
-        super().__init__()
+        super().__init__(hparams)
 
-        self.hparams = hparams
+        self.model = instantiate(self.hparams.model)
         self.loss = instantiate(hparams.loss)
         self.metrics = Metrics(self.loss, hparams.metrics)
-        self.optimizer_cfg = hparams.optimizer
-        self.model = instantiate(hparams.model)
 
     def configure_optimizers(self):
-        return instantiate(self.optimizer_cfg, self.parameters())
+        return instantiate(self.hparams.optimizer, self.parameters())
 
     def training_step(self, batch, batch_idx):
         x, y_true = batch
