@@ -61,7 +61,7 @@ class AbstractDefaultDataModule(LightningDataModule):
         return test_dl
 
 
-class ClassificationDataModuleAbstract(AbstractDefaultDataModule):
+class ClassificationDataModule(AbstractDefaultDataModule):
     """Datamodule for a standard classification setting with training instances and labels.
     """
 
