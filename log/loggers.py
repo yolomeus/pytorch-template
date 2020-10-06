@@ -8,8 +8,8 @@ class WandbBoundLogger(WandbLogger):
     """Extension of the WandbLogger that tracks minimum and maximum of all metrics over time.
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self._bounds_dict = {}
 
     @rank_zero_only

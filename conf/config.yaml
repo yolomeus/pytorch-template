@@ -16,7 +16,7 @@ training:
   patience: 5
 
 testing:
-  log_dir: 'outputs/model.mlp.MLP/2020-09-17/22-08-31'
+  log_dir: 'outputs/model.mlp.MLP/2020-10-05/14-09-52/'
   test_best_k: 3
   batch_size: 512
 

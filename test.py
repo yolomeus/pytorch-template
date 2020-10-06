@@ -6,6 +6,8 @@ from omegaconf import DictConfig
 from pytorch_lightning import seed_everything, Trainer, LightningDataModule
 from pytorch_lightning.loggers import WandbLogger
 
+from log.loggers import WandbBoundLogger
+
 
 def test_checkpoint(ckpt_path: str, test_cfg: DictConfig, trainer: Trainer, datamodule: LightningDataModule):
     """Load model state from checkpoint and test it.
@@ -16,7 +18,7 @@ def test_checkpoint(ckpt_path: str, test_cfg: DictConfig, trainer: Trainer, data
     :param datamodule: datamodule to test on.
     """
 
-    model_cls = get_class(test_cfg.model._target_)
+    model_cls = get_class(test_cfg.loop._target_)
     model = model_cls.load_from_checkpoint(ckpt_path)
     # make sure we're using the current test config and not the saved one
     model.test_conf = test_cfg.testing
@@ -34,7 +36,8 @@ def test(cfg: DictConfig):
                              test_conf=cfg.testing,
                              num_workers=cfg.num_workers)
 
-    trainer = Trainer(gpus=cfg.gpus, deterministic=True, logger=WandbLogger())
+    logger = WandbBoundLogger(tags=['test'])
+    trainer = Trainer(gpus=cfg.gpus, deterministic=True, logger=logger)
 
     log_dir = to_absolute_path(cfg.testing.log_dir)
     ckpt_dir = os.path.join(log_dir, 'checkpoints')
