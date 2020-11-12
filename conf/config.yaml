@@ -5,6 +5,7 @@ defaults:
 gpus: 1
 num_workers: 4
 random_seed: 1590258941
+wandb_log: False
 
 training:
   epochs: 100
@@ -16,7 +17,7 @@ training:
   patience: 5
 
 testing:
-  log_dir: 'outputs/model.mlp.MLP/2020-10-05/14-09-52/'
+  log_dir: 'outputs/model.mlp.MLP/2020-11-12/18-15-01'
   test_best_k: 3
   batch_size: 512
 

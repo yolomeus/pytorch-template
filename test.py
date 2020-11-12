@@ -35,7 +35,7 @@ def test(cfg: DictConfig):
                              test_conf=cfg.testing,
                              num_workers=cfg.num_workers)
 
-    logger = WandbBoundLogger(tags=['test'])
+    logger = WandbBoundLogger(tags=['test']) if cfg.wandb_log else True
     trainer = Trainer(gpus=cfg.gpus, deterministic=True, logger=logger)
 
     log_dir = to_absolute_path(cfg.testing.log_dir)

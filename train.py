@@ -29,8 +29,12 @@ def train(cfg: DictConfig):
                                    patience=train_cfg.patience,
                                    mode=train_cfg.mode,
                                    verbose=True)
-    logger = WandbBoundLogger()
-    logger.experiment.watch(training.model)
+
+    if cfg.wandb_log:
+        logger = WandbBoundLogger()
+        logger.experiment.watch(training.model)
+    else:
+        logger = True
 
     trainer = Trainer(max_epochs=train_cfg.epochs,
                       gpus=cfg.gpus,
