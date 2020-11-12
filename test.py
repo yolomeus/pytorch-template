@@ -36,7 +36,6 @@ def test(cfg: DictConfig):
                              num_workers=cfg.num_workers)
 
     logger = WandbBoundLogger(tags=['test']) if cfg.wandb_log else True
-    trainer = Trainer(gpus=cfg.gpus, deterministic=True, logger=logger)
 
     log_dir = to_absolute_path(cfg.testing.log_dir)
     ckpt_dir = os.path.join(log_dir, 'checkpoints')
