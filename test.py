@@ -4,7 +4,6 @@ import hydra
 from hydra.utils import get_class, to_absolute_path, instantiate
 from omegaconf import DictConfig
 from pytorch_lightning import seed_everything, Trainer, LightningDataModule
-from pytorch_lightning.loggers import WandbLogger
 
 from log.loggers import WandbBoundLogger
 
