@@ -3,17 +3,19 @@
 import torch
 from hydra.utils import instantiate
 from omegaconf import DictConfig
-from torch.nn import Module
+from torch.nn import Module, ModuleList
 
 from datamodule import DatasetSplit
 
 
-class Metrics:
+class Metrics(Module):
     """Stores and manages metrics during training/testing for log.
     """
 
     def __init__(self, loss: Module, metrics_config: DictConfig):
-        self.metrics = [] if metrics_config is None else [instantiate(metric) for metric in metrics_config]
+        super().__init__()
+        metrics = [] if metrics_config is None else [instantiate(metric) for metric in metrics_config]
+        self.metrics = ModuleList(metrics)
         self.loss = loss
 
     def compute_logs(self, outputs, split: DatasetSplit):
