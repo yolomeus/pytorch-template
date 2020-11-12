@@ -36,8 +36,7 @@ def train(cfg: DictConfig):
                       gpus=cfg.gpus,
                       deterministic=True,
                       logger=logger,
-                      checkpoint_callback=model_checkpoint,
-                      early_stop_callback=early_stopping)
+                      callbacks=[model_checkpoint, early_stopping])
 
     datamodule = instantiate(cfg.datamodule,
                              train_conf=cfg.training,
