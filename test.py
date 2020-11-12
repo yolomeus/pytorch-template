@@ -40,10 +40,11 @@ def test(cfg: DictConfig):
 
     log_dir = to_absolute_path(cfg.testing.log_dir)
     ckpt_dir = os.path.join(log_dir, 'checkpoints')
-    for i, file in enumerate(reversed(os.listdir(ckpt_dir))):
-        if i == cfg.testing.test_best_k:
-            break
+
+    top_k = os.listdir(ckpt_dir)[-cfg.testing.test_best_k:]
+    for file in top_k:
         ckpt_path = os.path.join(ckpt_dir, file)
+        trainer = Trainer(gpus=cfg.gpus, deterministic=True, logger=logger, resume_from_checkpoint=ckpt_path)
         test_checkpoint(ckpt_path, cfg, trainer, datamodule)
 
 
