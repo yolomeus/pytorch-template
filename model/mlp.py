@@ -15,9 +15,6 @@ class MLP(Module):
         :param h_dim: hidden dimension
         :param out_dim: output dimension
         :param dropout: dropout rate
-        :param loss: config object representing loss.
-        :param optimizer: config object representing optimizer.
-        :param hparams: all hyperparameters.
         """
 
         super().__init__()
