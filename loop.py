@@ -44,8 +44,8 @@ class DefaultClassificationLoop(AbstractBaseLoop, ABC):
         y_pred = self.model(x)
         loss = self.loss(y_pred, y_true)
 
-        logs = {'batch_loss': loss}
-        return {'loss': loss, 'log': logs, 'y_pred': y_pred, 'y_true': y_true}
+        self.log('batch_loss', loss)
+        return {'loss': loss, 'y_pred': y_pred, 'y_true': y_true}
 
     def validation_step(self, batch, batch_idx):
         x, y_true = batch
@@ -56,13 +56,13 @@ class DefaultClassificationLoop(AbstractBaseLoop, ABC):
         return self.validation_step(batch, batch_idx)
 
     def training_epoch_end(self, outputs):
-        return self._epoch_end(outputs, DatasetSplit.TRAIN)
+        self._epoch_end(outputs, DatasetSplit.TRAIN)
 
     def validation_epoch_end(self, outputs):
-        return self._epoch_end(outputs, DatasetSplit.VALIDATION)
+        self._epoch_end(outputs, DatasetSplit.VALIDATION)
 
     def test_epoch_end(self, outputs):
-        return self._epoch_end(outputs, DatasetSplit.TEST)
+        self._epoch_end(outputs, DatasetSplit.TEST)
 
     def _epoch_end(self, outputs, split: DatasetSplit):
         """Compute loss and all metrics at the end of an epoch.
@@ -72,4 +72,4 @@ class DefaultClassificationLoop(AbstractBaseLoop, ABC):
         :return: a dict containing loss and metric logs.
         """
         logs = self.metrics.compute_logs(outputs, split)
-        return {'log': logs}
+        self.log_dict(logs)
