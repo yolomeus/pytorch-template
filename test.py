@@ -33,7 +33,8 @@ def test(cfg: DictConfig):
     datamodule = instantiate(cfg.datamodule,
                              train_conf=cfg.training,
                              test_conf=cfg.testing,
-                             num_workers=cfg.num_workers)
+                             num_workers=cfg.num_workers,
+                             pin_memory=cfg.gpus > 0)
 
     logger = WandbBoundLogger(tags=['test']) if cfg.wandb_log else True
 

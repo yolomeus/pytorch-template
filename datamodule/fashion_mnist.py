@@ -30,7 +30,8 @@ class FashionMNISTDataModule(ClassificationDataModule):
                  val_size: float,
                  train_conf: DictConfig,
                  test_conf: DictConfig,
-                 num_workers: int):
+                 num_workers: int,
+                 pin_memory: bool):
         """
 
         :param download: whether to download the dataset or not. Only downloads if files aren't  present already.
@@ -43,9 +44,10 @@ class FashionMNISTDataModule(ClassificationDataModule):
         :param val_size: percentage of the train set to use for validation e.g. 0.2 for 20%.
         :param train_conf: training configuration.
         :param test_conf: testing configuration
-        :param num_workers: number of workers for dataloaders to use.
+        :param num_workers: number of workers for DataLoaders to use.
+        :param pin_memory: tell the DataLoaders whether to pin_memory or not.
         """
-        super().__init__(train_conf, test_conf, num_workers)
+        super().__init__(train_conf, test_conf, num_workers, pin_memory)
 
         self.download = download
         self.download_base_url = download_base_url

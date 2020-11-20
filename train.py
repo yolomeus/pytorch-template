@@ -15,7 +15,7 @@ def train(cfg: DictConfig):
 
     seed_everything(cfg.random_seed)
 
-    training = instantiate(cfg.loop, cfg)
+    training_loop = instantiate(cfg.loop, cfg)
 
     train_cfg = cfg.training
     ckpt_path = os.path.join(os.getcwd(), 'checkpoints/{epoch:03d}-{' + train_cfg.monitor + ':.3f}')
@@ -32,7 +32,7 @@ def train(cfg: DictConfig):
 
     if cfg.wandb_log:
         logger = WandbBoundLogger()
-        logger.experiment.watch(training.model)
+        logger.experiment.watch(training_loop.model)
     else:
         logger = True
 
@@ -45,9 +45,10 @@ def train(cfg: DictConfig):
     datamodule = instantiate(cfg.datamodule,
                              train_conf=cfg.training,
                              test_conf=cfg.testing,
-                             num_workers=cfg.num_workers)
+                             num_workers=cfg.num_workers,
+                             pin_memory=cfg.gpus > 0)
 
-    trainer.fit(training, datamodule=datamodule)
+    trainer.fit(training_loop, datamodule=datamodule)
 
 
 if __name__ == '__main__':

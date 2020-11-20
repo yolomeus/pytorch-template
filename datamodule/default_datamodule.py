@@ -10,12 +10,13 @@ class AbstractDefaultDataModule(LightningDataModule):
     """Base class for pytorch-lightning DataModule datasets. Subclass this if you have a standard train, validation,
     test split."""
 
-    def __init__(self, train_conf, test_conf, num_workers):
+    def __init__(self, train_conf, test_conf, num_workers, pin_memory):
         super().__init__()
 
-        self.train_conf = train_conf
-        self.test_conf = test_conf
-        self.num_workers = num_workers
+        self._train_conf = train_conf
+        self._test_conf = test_conf
+        self._num_workers = num_workers
+        self._pin_memory = pin_memory
 
     @property
     @abstractmethod
@@ -43,21 +44,24 @@ class AbstractDefaultDataModule(LightningDataModule):
 
     def train_dataloader(self):
         train_dl = DataLoader(self.train_ds,
-                              self.train_conf.batch_size,
+                              self._train_conf.batch_size,
                               shuffle=True,
-                              num_workers=self.num_workers)
+                              num_workers=self._num_workers,
+                              pin_memory=self._pin_memory)
         return train_dl
 
     def val_dataloader(self):
         val_dl = DataLoader(self.val_ds,
-                            self.test_conf.batch_size,
-                            num_workers=self.num_workers)
+                            self._test_conf.batch_size,
+                            num_workers=self._num_workers,
+                            pin_memory=self._pin_memory)
         return val_dl
 
     def test_dataloader(self):
         test_dl = DataLoader(self.test_ds,
-                             self.test_conf.batch_size,
-                             num_workers=self.num_workers)
+                             self._test_conf.batch_size,
+                             num_workers=self._num_workers,
+                             pin_memory=self._pin_memory)
         return test_dl
 
 
@@ -65,8 +69,13 @@ class ClassificationDataModule(AbstractDefaultDataModule):
     """Datamodule for a standard classification setting with training instances and labels.
     """
 
-    def __init__(self, train_conf, test_conf, num_workers):
-        super().__init__(train_conf, test_conf, num_workers)
+    @abstractmethod
+    def prepare_instances_and_labels(self, split: DatasetSplit):
+        """Get tuple of instances and labels for classification.
+
+        :param split: the dataset split use.
+        :return (tuple): instances and labels for a specific split.
+        """
 
     def _create_dataset(self, split: DatasetSplit):
         """Helper factory method for building a split specific pytorch dataset.
@@ -87,14 +96,6 @@ class ClassificationDataModule(AbstractDefaultDataModule):
     @property
     def test_ds(self):
         return self._create_dataset(DatasetSplit.TEST)
-
-    @abstractmethod
-    def prepare_instances_and_labels(self, split: DatasetSplit):
-        """Get tuple of instances and labels for classification.
-
-        :param split: the dataset split use.
-        :return (tuple): instances and labels for a specific split.
-        """
 
     class _ClassificationDataset(Dataset):
         """Pytorch Dataset for standard classification setting.
