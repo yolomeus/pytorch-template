@@ -10,6 +10,7 @@ wandb_log: False
 training:
   epochs: 100
   batch_size: 32
+  accumulate_batches: 1
   # checkpointing
   save_ckpts: 10
   monitor: val_loss
@@ -17,7 +18,7 @@ training:
   patience: 5
 
 testing:
-  log_dir: 'outputs/model.mlp.MLP/2020-11-12/18-15-01'
+  log_dir: 'outputs/model.mlp.MLP/2020-11-20/17-44-33'
   test_best_k: 5
   batch_size: 512
 
