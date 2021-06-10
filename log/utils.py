@@ -26,8 +26,8 @@ class Metrics(Module):
         :return: a dict mapping from metric names to their values.
         """
         y_pred, y_true = self._unpack_outputs('y_pred', outputs), self._unpack_outputs('y_true', outputs)
-
-        logs = {f'{split.value}_' + self._classname(metric): metric(y_pred, y_true) for metric in self.metrics}
+        y_prob = y_pred.softmax(dim=-1)
+        logs = {f'{split.value}_' + self._classname(metric): metric(y_prob, y_true) for metric in self.metrics}
         loss = self.loss(y_pred, y_true)
         # when testing we want to log a scalar and not a tensor
         if split == DatasetSplit.TEST:

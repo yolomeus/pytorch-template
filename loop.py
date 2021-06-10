@@ -71,5 +71,6 @@ class DefaultClassificationLoop(AbstractBaseLoop, ABC):
         :param outputs: gathered outputs from *_epoch_end
         :return: a dict containing loss and metric logs.
         """
+
         logs = self.metrics.compute_logs(outputs, split)
         self.log_dict(logs)

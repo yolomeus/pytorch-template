@@ -18,12 +18,13 @@ def train(cfg: DictConfig):
     training_loop = instantiate(cfg.loop, cfg)
 
     train_cfg = cfg.training
-    ckpt_path = os.path.join(os.getcwd(), 'checkpoints/{epoch:03d}-{' + train_cfg.monitor + ':.3f}')
+    ckpt_path = os.path.join(os.getcwd(), 'checkpoints/')
     model_checkpoint = ModelCheckpoint(save_top_k=train_cfg.save_ckpts,
                                        monitor=train_cfg.monitor,
                                        mode=train_cfg.mode,
                                        verbose=True,
-                                       filepath=ckpt_path)
+                                       filename='{epoch:03d}-{' + train_cfg.monitor + ':.3f}',
+                                       dirpath=ckpt_path)
 
     early_stopping = EarlyStopping(monitor=train_cfg.monitor,
                                    patience=train_cfg.patience,
