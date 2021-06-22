@@ -70,7 +70,7 @@ class ClassificationDataModule(AbstractDefaultDataModule):
     """
 
     @abstractmethod
-    def prepare_instances_and_labels(self, split: DatasetSplit):
+    def instances_and_labels(self, split: DatasetSplit):
         """Get tuple of instances and labels for classification.
 
         :param split: the dataset split use.
@@ -83,7 +83,7 @@ class ClassificationDataModule(AbstractDefaultDataModule):
         :param split: which split to build.
         :return: the split specific pytorch dataset.
         """
-        return self._ClassificationDataset(*self.prepare_instances_and_labels(split))
+        return self._ClassificationDataset(*self.instances_and_labels(split))
 
     @property
     def train_ds(self):
