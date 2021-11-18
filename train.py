@@ -39,7 +39,6 @@ def train(cfg: DictConfig):
 
     trainer = Trainer(max_epochs=train_cfg.epochs,
                       gpus=cfg.gpus,
-                      deterministic=True,
                       logger=logger,
                       callbacks=[model_checkpoint, early_stopping],
                       accumulate_grad_batches=train_cfg.accumulate_batches)

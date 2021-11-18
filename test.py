@@ -44,7 +44,7 @@ def test(cfg: DictConfig):
     top_k = os.listdir(ckpt_dir)[-cfg.testing.test_best_k:]
     for file in top_k:
         ckpt_path = os.path.join(ckpt_dir, file)
-        trainer = Trainer(gpus=cfg.gpus, deterministic=True, logger=logger, resume_from_checkpoint=ckpt_path)
+        trainer = Trainer(gpus=cfg.gpus, logger=logger, resume_from_checkpoint=ckpt_path)
         test_checkpoint(ckpt_path, cfg, trainer, datamodule)
 
 
