@@ -4,7 +4,7 @@ from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.utilities import rank_zero_only
 
 
-class WandbBoundLogger(WandbLogger):
+class WandbMinMaxLogger(WandbLogger):
     """Extension of the WandbLogger that tracks minimum and maximum of all metrics over time.
     """
 

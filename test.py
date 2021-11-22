@@ -5,7 +5,7 @@ from hydra.utils import get_class, to_absolute_path, instantiate
 from omegaconf import DictConfig
 from pytorch_lightning import seed_everything, Trainer, LightningDataModule
 
-from log.loggers import WandbBoundLogger
+from log.loggers import WandbMinMaxLogger
 
 
 def test_checkpoint(ckpt_path: str, test_cfg: DictConfig, trainer: Trainer, datamodule: LightningDataModule):
@@ -36,7 +36,7 @@ def test(cfg: DictConfig):
                              num_workers=cfg.num_workers,
                              pin_memory=cfg.gpus > 0)
 
-    logger = WandbBoundLogger(tags=['test']) if cfg.wandb_log else True
+    logger = WandbMinMaxLogger(tags=['test']) if cfg.wandb_log else True
 
     log_dir = to_absolute_path(cfg.testing.log_dir)
     ckpt_dir = os.path.join(log_dir, 'checkpoints')

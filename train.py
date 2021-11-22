@@ -6,7 +6,7 @@ from omegaconf import DictConfig
 from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 
-from log.loggers import WandbBoundLogger
+from log.loggers import WandbMinMaxLogger
 
 
 @hydra.main(config_path='conf', config_name='config')
@@ -32,7 +32,7 @@ def train(cfg: DictConfig):
                                    verbose=True)
 
     if cfg.wandb_log:
-        logger = WandbBoundLogger()
+        logger = WandbMinMaxLogger()
         logger.experiment.watch(training_loop.model)
     else:
         logger = True
