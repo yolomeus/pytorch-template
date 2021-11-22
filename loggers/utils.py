@@ -20,9 +20,9 @@ class Metrics(Module):
         self.loss = loss
 
     def compute_logs(self, outputs, split: DatasetSplit):
-        """Compute a global log dict from multiple single step dicts.
+        """Compute a global loggers dict from multiple single step dicts.
 
-        :param split: split for prefixing metric names in log dict.
+        :param split: split for prefixing metric names in loggers dict.
         :param outputs: set of output dicts, each containing y_pred and y_true.
         :return: a dict mapping from metric names to their values.
         """

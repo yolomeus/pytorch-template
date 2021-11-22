@@ -5,7 +5,7 @@ from hydra.utils import get_class, to_absolute_path, instantiate
 from omegaconf import DictConfig
 from pytorch_lightning import seed_everything, Trainer, LightningDataModule
 
-from log.loggers import WandbMinMaxLogger
+from loggers.loggers import WandbMinMaxLogger
 
 
 def test_checkpoint(ckpt_path: str, test_cfg: DictConfig, trainer: Trainer, datamodule: LightningDataModule):

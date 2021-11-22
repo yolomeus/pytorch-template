@@ -9,7 +9,7 @@ from omegaconf import DictConfig
 from pytorch_lightning import LightningModule
 
 from datamodule import DatasetSplit
-from log.utils import Metrics
+from loggers.utils import Metrics
 
 
 class AbstractBaseLoop(LightningModule, ABC):

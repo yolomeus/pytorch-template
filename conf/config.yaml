@@ -29,7 +29,7 @@ metrics:
     num_classes: 10
 
 logger:
-  _target_: log.loggers.WandbMinMaxLogger
+  _target_: loggers.loggers.WandbMinMaxLogger
 
 log_gradients: False
 
