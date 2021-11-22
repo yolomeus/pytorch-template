@@ -31,7 +31,7 @@ metrics:
 
 
 logger:
-  _target_: loggers.loggers.WandbMinMaxLogger
+  _target_: logger.loggers.WandbMinMaxLogger
 log_gradients: False
 
 hydra:
