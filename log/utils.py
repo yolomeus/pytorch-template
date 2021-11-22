@@ -3,6 +3,7 @@
 import torch
 from hydra.utils import instantiate
 from omegaconf import DictConfig
+from torch import Tensor
 from torch.nn import Module, ModuleList
 
 from datamodule import DatasetSplit
@@ -26,7 +27,7 @@ class Metrics(Module):
         :return: a dict mapping from metric names to their values.
         """
         y_pred, y_true = self._unpack_outputs('y_pred', outputs), self._unpack_outputs('y_true', outputs)
-        y_prob = y_pred.softmax(dim=-1)
+        y_prob = self._to_probabilities(y_pred)
         logs = {f'{split.value}_' + self._classname(metric): metric(y_prob, y_true) for metric in self.metrics}
         loss = self.loss(y_pred, y_true)
         # when testing we want to log a scalar and not a tensor
@@ -35,6 +36,18 @@ class Metrics(Module):
         logs[f'{split.value}_loss'] = loss
 
         return logs
+
+    @staticmethod
+    def _to_probabilities(logits: Tensor):
+        """Softmax normalize along the last dimension for multiclass targets (C>1), or use sigmoid in the case of 1D
+        predictions (C=1).
+
+        :param logits: a batch of raw, un-normalized prediction scores with shape (N, *, C).
+        :return: a batch of probabilities.
+        """
+        if logits.shape[-1] > 1:
+            return logits.softmax(dim=-1)
+        return logits.sigmoid()
 
     @staticmethod
     def _unpack_outputs(key, outputs):
