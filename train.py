@@ -6,8 +6,6 @@ from omegaconf import DictConfig
 from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 
-from log.loggers import WandbMinMaxLogger
-
 
 @hydra.main(config_path='conf', config_name='config')
 def train(cfg: DictConfig):
@@ -31,10 +29,12 @@ def train(cfg: DictConfig):
                                    mode=train_cfg.mode,
                                    verbose=True)
 
-    if cfg.wandb_log:
-        logger = WandbMinMaxLogger()
-        logger.experiment.watch(training_loop.model)
+    if cfg.logger is not None:
+        logger = instantiate(cfg.logger)
+        if cfg.log_gradients:
+            logger.experiment.watch(training_loop.model)
     else:
+        # setting to True will use the default logger
         logger = True
 
     trainer = Trainer(max_epochs=train_cfg.epochs,
