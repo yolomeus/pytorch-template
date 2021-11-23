@@ -21,7 +21,7 @@ class AbstractBaseLoop(LightningModule, ABC):
         self.save_hyperparameters(hparams)
 
 
-class DefaultClassificationLoop(AbstractBaseLoop, ABC):
+class DefaultClassificationLoop(AbstractBaseLoop):
     """Default wrapper for training/testing a pytorch module using pytorch-lightning. Assumes a standard classification
     task with instance-label pairs (x, y) and a loss function that has the signature loss(y_pred, y_true).
     """
