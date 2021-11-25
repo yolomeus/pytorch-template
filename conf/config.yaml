@@ -1,6 +1,7 @@
 defaults:
   - model: mlp
   - datamodule: fashion_mnist
+  - loop: default_loop
 
 
 gpus: 1
@@ -33,6 +34,7 @@ metrics:
 logger:
   _target_: logger.loggers.WandbMinMaxLogger
 log_gradients: False
+
 
 hydra:
   run:
