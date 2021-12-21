@@ -48,7 +48,8 @@ class AbstractDefaultDataModule(LightningDataModule):
                               shuffle=True,
                               num_workers=self._num_workers,
                               pin_memory=self._pin_memory,
-                              collate_fn=self.build_collate_fn(DatasetSplit.TRAIN))
+                              collate_fn=self.build_collate_fn(DatasetSplit.TRAIN),
+                              persistent_workers=True)
         return train_dl
 
     def val_dataloader(self):
@@ -56,7 +57,8 @@ class AbstractDefaultDataModule(LightningDataModule):
                             self._test_conf.batch_size,
                             num_workers=self._num_workers,
                             pin_memory=self._pin_memory,
-                            collate_fn=self.build_collate_fn(DatasetSplit.VALIDATION))
+                            collate_fn=self.build_collate_fn(DatasetSplit.VALIDATION),
+                            persistent_workers=True)
         return val_dl
 
     def test_dataloader(self):
@@ -64,7 +66,8 @@ class AbstractDefaultDataModule(LightningDataModule):
                              self._test_conf.batch_size,
                              num_workers=self._num_workers,
                              pin_memory=self._pin_memory,
-                             collate_fn=self.build_collate_fn(DatasetSplit.TEST))
+                             collate_fn=self.build_collate_fn(DatasetSplit.TEST),
+                             persistent_workers=True)
         return test_dl
 
     # noinspection PyMethodMayBeStatic
