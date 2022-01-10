@@ -29,7 +29,6 @@ metrics:
     - _target_: torchmetrics.F1
       num_classes: 10
 
-
 logger:
   _target_: logger.loggers.WandbMinMaxLogger
 log_gradients: False

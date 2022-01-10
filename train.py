@@ -15,6 +15,7 @@ def train(cfg: DictConfig):
 
     model = instantiate(cfg.model)
     training_loop = instantiate(cfg.loop,
+                                # hparams for saving
                                 cfg,
                                 model=model,
                                 # pass model params to optimizer constructor
