@@ -44,7 +44,7 @@ class Metrics(Module):
             metrics = self.val_metrics
 
         for metric in metrics:
-            metric(y_prob, y_true.long())
+            metric(y_prob, y_true)
             loop.log(f'{split.value}/' + self.classname(metric),
                      metric,
                      on_step=False,
