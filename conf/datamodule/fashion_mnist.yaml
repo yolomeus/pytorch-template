@@ -1,4 +1,3 @@
-# @package datamodule
 _target_: datamodule.fashion_mnist.FashionMNISTDataModule
 
 download: True
