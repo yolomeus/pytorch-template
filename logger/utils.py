@@ -4,7 +4,7 @@ from typing import List
 
 from hydra.utils import instantiate
 from omegaconf import DictConfig
-from torch.nn import Module, ModuleList, Softmax, Sigmoid
+from torch.nn import Module, ModuleList, Softmax, Sigmoid, Identity
 
 from datamodule import DatasetSplit
 
@@ -18,7 +18,7 @@ class Metrics(Module):
 
         :param loss: the loss module for computing the loss metric.
         :param metrics_configs: dict configs for each metric to instantiate.
-        :param to_probabilities: either 'sigmoid' or 'softmax', used to convert raw model predictions into
+        :param to_probabilities: either 'sigmoid', 'softmax' or 'identity' (None), used to convert raw model predictions into
         probabilities before passing them into a metric function.
         """
         super().__init__()
@@ -32,6 +32,9 @@ class Metrics(Module):
             self._to_probabilities = Sigmoid()
         elif to_probabilities == 'softmax':
             self._to_probabilities = Softmax(dim=-1)
+
+        elif to_probabilities in [None, 'identity']:
+            self._to_probabilities = Identity()
 
     def forward(self, loop, y_pred, y_true, split: DatasetSplit):
         y_prob = self._to_probabilities(y_pred)
