@@ -38,4 +38,8 @@ log_gradients: False
 
 hydra:
   run:
-    dir: ./outputs/${model._target_}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    dir: ./outputs/single/${model._target_}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+
+  sweep:
+    dir: outputs/sweep/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    # subdir: lr:${loop.optimizer.lr}
