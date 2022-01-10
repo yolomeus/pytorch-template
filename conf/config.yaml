@@ -19,11 +19,10 @@ training:
   patience: 5
 
 testing:
-  log_dir: 'outputs/model.mlp.MLP/2020-11-20/17-44-33'
-  test_best_k: 5
   batch_size: 512
 
 metrics:
+  # apply before passing to metrics
   to_probabilities: 'softmax'
   metrics_list:
     - _target_: torchmetrics.Accuracy

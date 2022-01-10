@@ -22,11 +22,13 @@ def train(cfg: DictConfig):
 
     train_cfg = cfg.training
     ckpt_path = os.path.join(os.getcwd(), 'checkpoints/')
+    filename = 'epoch-{epoch:03d}-' + train_cfg.monitor.replace('/', '_') + '-{' + train_cfg.monitor + ':.4f}'
     model_checkpoint = ModelCheckpoint(save_top_k=train_cfg.save_ckpts,
                                        monitor=train_cfg.monitor,
                                        mode=train_cfg.mode,
                                        verbose=True,
-                                       filename='{epoch:03d}-{' + train_cfg.monitor + ':.3f}',
+                                       filename=filename,
+                                       auto_insert_metric_name=False,
                                        dirpath=ckpt_path)
 
     early_stopping = EarlyStopping(monitor=train_cfg.monitor,
@@ -55,6 +57,9 @@ def train(cfg: DictConfig):
                              pin_memory=cfg.gpus > 0)
 
     trainer.fit(training_loop, datamodule=datamodule)
+
+    # only look at this in the very end ;)
+    trainer.test(ckpt_path='best')
 
 
 if __name__ == '__main__':
