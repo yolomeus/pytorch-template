@@ -11,7 +11,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 def train(cfg: DictConfig):
     """Train a pytorch model specified by the config file"""
 
-    seed_everything(cfg.random_seed)
+    seed_everything(cfg.random_seed, workers=True)
 
     model = instantiate(cfg.model)
     training_loop = instantiate(cfg.loop,
