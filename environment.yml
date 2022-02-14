@@ -4,14 +4,12 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - pip=20.2.2
   - python=3.9
-  - pytorch=1.9.0
-  - torchvision
-  - torchaudio
-  - cudatoolkit=11.1
-  - pytorch-lightning=1.5.8
+  - pip=22.0.3
+  - pytorch=1.10.2
+  - cudatoolkit=11.3
+  - pytorch-lightning=1.5.10
   - scikit-learn=0.24.2
   - pip:
-      - hydra-core==1.1.0
-      - wandb==0.12.9
+      - hydra-core==1.1.1
+      - wandb==0.12.10
