@@ -1,7 +1,7 @@
 from abc import abstractmethod
 
 from pytorch_lightning import LightningDataModule
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader, TensorDataset
 
 from datamodule import DatasetSplit
 
@@ -105,7 +105,7 @@ class ClassificationDataModule(AbstractDefaultDataModule):
         :param split: which split to build.
         :return: the split specific pytorch dataset.
         """
-        return self._ClassificationDataset(*self.instances_and_labels(split))
+        return TensorDataset(*self.instances_and_labels(split))
 
     @property
     def train_ds(self):
@@ -118,17 +118,3 @@ class ClassificationDataModule(AbstractDefaultDataModule):
     @property
     def test_ds(self):
         return self._create_dataset(DatasetSplit.TEST)
-
-    class _ClassificationDataset(Dataset):
-        """Pytorch Dataset for standard classification setting.
-        """
-
-        def __init__(self, instances, labels):
-            self.instances = instances
-            self.labels = labels
-
-        def __getitem__(self, index):
-            return self.instances[index], self.labels[index]
-
-        def __len__(self):
-            return len(self.instances)
