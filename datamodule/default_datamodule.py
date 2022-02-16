@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from typing import Optional
 
 from pytorch_lightning import LightningDataModule
 from torch.utils.data import DataLoader, TensorDataset
@@ -18,7 +19,18 @@ class AbstractDefaultDataModule(LightningDataModule):
         self._num_workers = num_workers
         self._pin_memory = pin_memory
 
-    @property
+        self._train_ds = None
+        self._val_ds = None
+        self._test_ds = None
+
+    def setup(self, stage: Optional[str] = None) -> None:
+        # setup train and validation datasets
+        if stage in (None, 'fit'):
+            self._train_ds, self._val_ds = self.train_ds(), self.val_ds()
+        # setup test dataset
+        if stage in (None, 'test'):
+            self._test_ds = self.test_ds()
+
     @abstractmethod
     def train_ds(self):
         """Build the train pytorch dataset.
@@ -26,7 +38,6 @@ class AbstractDefaultDataModule(LightningDataModule):
         :return: the train pytorch dataset.
         """
 
-    @property
     @abstractmethod
     def val_ds(self):
         """Build the validation pytorch dataset.
@@ -34,7 +45,6 @@ class AbstractDefaultDataModule(LightningDataModule):
         :return: the validation pytorch dataset.
         """
 
-    @property
     @abstractmethod
     def test_ds(self):
         """Build the test pytorch dataset.
@@ -43,7 +53,7 @@ class AbstractDefaultDataModule(LightningDataModule):
         """
 
     def train_dataloader(self):
-        train_dl = DataLoader(self.train_ds,
+        train_dl = DataLoader(self._train_ds,
                               self._train_conf.batch_size,
                               shuffle=True,
                               num_workers=self._num_workers,
@@ -53,7 +63,7 @@ class AbstractDefaultDataModule(LightningDataModule):
         return train_dl
 
     def val_dataloader(self):
-        val_dl = DataLoader(self.val_ds,
+        val_dl = DataLoader(self._val_ds,
                             self._test_conf.batch_size,
                             num_workers=self._num_workers,
                             pin_memory=self._pin_memory,
@@ -62,7 +72,7 @@ class AbstractDefaultDataModule(LightningDataModule):
         return val_dl
 
     def test_dataloader(self):
-        test_dl = DataLoader(self.test_ds,
+        test_dl = DataLoader(self._test_ds,
                              self._test_conf.batch_size,
                              num_workers=self._num_workers,
                              pin_memory=self._pin_memory,
@@ -93,28 +103,17 @@ class ClassificationDataModule(AbstractDefaultDataModule):
 
     @abstractmethod
     def instances_and_labels(self, split: DatasetSplit):
-        """Get tuple of instances and labels for classification.
+        """Get tuple of instances and labels for classification based on the requested split.
 
         :param split: the dataset split use.
         :return (tuple): instances and labels for a specific split.
         """
 
-    def _create_dataset(self, split: DatasetSplit):
-        """Helper factory method for building a split specific pytorch dataset.
-
-        :param split: which split to build.
-        :return: the split specific pytorch dataset.
-        """
-        return TensorDataset(*self.instances_and_labels(split))
-
-    @property
     def train_ds(self):
-        return self._create_dataset(DatasetSplit.TRAIN)
+        return TensorDataset(*self.instances_and_labels(DatasetSplit.TRAIN))
 
-    @property
     def val_ds(self):
-        return self._create_dataset(DatasetSplit.VALIDATION)
+        return TensorDataset(*self.instances_and_labels(DatasetSplit.VALIDATION))
 
-    @property
     def test_ds(self):
-        return self._create_dataset(DatasetSplit.TEST)
+        return TensorDataset(*self.instances_and_labels(DatasetSplit.TEST))

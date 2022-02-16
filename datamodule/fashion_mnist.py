@@ -1,6 +1,5 @@
 import gzip
 import os
-from typing import Optional
 from urllib.parse import urljoin
 from urllib.request import urlretrieve
 
@@ -69,15 +68,6 @@ class FashionMNISTDataModule(ClassificationDataModule):
         self.test_images = None
         self.test_labels = None
 
-    def instances_and_labels(self, split: DatasetSplit):
-        if split == DatasetSplit.TEST:
-            return self.test_images, self.test_labels
-        elif split == DatasetSplit.VALIDATION:
-            return self.val_images, self.val_labels
-        elif split == DatasetSplit.TRAIN:
-            return self.train_images, self.train_labels
-        raise NotImplementedError(f'Implementation for {split} does not exist.')
-
     def prepare_data(self, *args, **kwargs):
         if self.download:
             os.makedirs(self.data_dir, exist_ok=True)
@@ -88,7 +78,19 @@ class FashionMNISTDataModule(ClassificationDataModule):
                     full_url = urljoin(self.download_base_url, filename)
                     urlretrieve(full_url, downloaded_file)
 
-    def setup(self, stage: Optional[str] = None):
+    def instances_and_labels(self, split: DatasetSplit):
+        if self.train_images is None:
+            self._setup_splits()
+
+        if split == DatasetSplit.TEST:
+            return self.test_images, self.test_labels
+        elif split == DatasetSplit.VALIDATION:
+            return self.val_images, self.val_labels
+        elif split == DatasetSplit.TRAIN:
+            return self.train_images, self.train_labels
+        raise NotImplementedError(f'Implementation for {split} does not exist.')
+
+    def _setup_splits(self):
         def _data_dir(filename):
             return os.path.join(self.data_dir, filename)
 
