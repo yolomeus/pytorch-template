@@ -11,12 +11,19 @@ class AbstractDefaultDataModule(LightningDataModule):
     """Base class for pytorch-lightning DataModule datasets. Subclass this if you have a standard train, validation,
     test split."""
 
-    def __init__(self, train_conf, test_conf, num_workers, pin_memory):
+    def __init__(self,
+                 train_batch_size: int,
+                 test_batch_size: int,
+                 num_workers: int,
+                 persistent_workers: bool,
+                 pin_memory: bool):
         super().__init__()
 
-        self._train_conf = train_conf
-        self._test_conf = test_conf
+        self._train_batch_size = train_batch_size
+        self._test_batch_size = test_batch_size
+
         self._num_workers = num_workers
+        self._persistent_workers = persistent_workers
         self._pin_memory = pin_memory
 
         self._train_ds = None
@@ -54,30 +61,30 @@ class AbstractDefaultDataModule(LightningDataModule):
 
     def train_dataloader(self):
         train_dl = DataLoader(self._train_ds,
-                              self._train_conf.batch_size,
+                              self._train_batch_size,
                               shuffle=True,
                               num_workers=self._num_workers,
                               pin_memory=self._pin_memory,
                               collate_fn=self.build_collate_fn(DatasetSplit.TRAIN),
-                              persistent_workers=self._num_workers > 0)
+                              persistent_workers=self._persistent_workers)
         return train_dl
 
     def val_dataloader(self):
         val_dl = DataLoader(self._val_ds,
-                            self._test_conf.batch_size,
+                            self._test_batch_size,
                             num_workers=self._num_workers,
                             pin_memory=self._pin_memory,
                             collate_fn=self.build_collate_fn(DatasetSplit.VALIDATION),
-                            persistent_workers=self._num_workers > 0)
+                            persistent_workers=self._persistent_workers)
         return val_dl
 
     def test_dataloader(self):
         test_dl = DataLoader(self._test_ds,
-                             self._test_conf.batch_size,
+                             self._test_batch_size,
                              num_workers=self._num_workers,
                              pin_memory=self._pin_memory,
                              collate_fn=self.build_collate_fn(DatasetSplit.TEST),
-                             persistent_workers=self._num_workers > 0)
+                             persistent_workers=self._persistent_workers)
         return test_dl
 
     # noinspection PyMethodMayBeStatic

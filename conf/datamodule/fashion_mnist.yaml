@@ -1,6 +1,9 @@
+defaults:
+  - base
+
 _target_: datamodule.fashion_mnist.FashionMNISTDataModule
 
-download: True
+download: true
 download_base_url: http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/
 data_dir: data/fashion_mnist
 

@@ -6,7 +6,6 @@ from urllib.request import urlretrieve
 import numpy as np
 import torch
 from hydra.utils import to_absolute_path
-from omegaconf import DictConfig
 from sklearn.model_selection import train_test_split
 
 from datamodule import DatasetSplit
@@ -27,9 +26,10 @@ class FashionMNISTDataModule(ClassificationDataModule):
                  test_img_file: str,
                  test_label_file: str,
                  val_size: float,
-                 train_conf: DictConfig,
-                 test_conf: DictConfig,
+                 train_batch_size: int,
+                 test_batch_size: int,
                  num_workers: int,
+                 persistent_workers: bool,
                  pin_memory: bool):
         """
 
@@ -41,12 +41,14 @@ class FashionMNISTDataModule(ClassificationDataModule):
         :param test_img_file: file containing the test images.
         :param test_label_file: file containing the test labels.
         :param val_size: percentage of the train set to use for validation e.g. 0.2 for 20%.
-        :param train_conf: training configuration.
-        :param test_conf: testing configuration
+        :param train_batch_size: number of samples in a training batch.
+        :param test_batch_size: number of samples in a validation or test batch.
         :param num_workers: number of workers for DataLoaders to use.
-        :param pin_memory: tell the DataLoaders whether to pin_memory or not.
+        :param persistent_workers: tell DataLoaders whether to keep workers between epochs or re-initialize.
+        :param pin_memory: tell DataLoaders whether to pin_memory or not.
         """
-        super().__init__(train_conf, test_conf, num_workers, pin_memory)
+
+        super().__init__(train_batch_size, test_batch_size, num_workers, persistent_workers, pin_memory)
 
         self.download = download
         self.download_base_url = download_base_url
