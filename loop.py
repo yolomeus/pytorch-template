@@ -27,7 +27,7 @@ class DefaultClassificationLoop(AbstractBaseLoop):
     task with instance-label pairs (x, y) and a loss function that has the signature loss(y_pred, y_true).
     """
 
-    def __init__(self, hparams: DictConfig, model: Module, optimizer: Optimizer, loss: Module):
+    def __init__(self, hparams: DictConfig, model: Module, loss: Module, optimizer: Optimizer, metrics: Metrics):
         """
         :param hparams: contains all hyperparameters.
         """
@@ -36,7 +36,7 @@ class DefaultClassificationLoop(AbstractBaseLoop):
         self.model = model
         self.loss = loss
         self.optimizer = optimizer
-        self.metrics = Metrics(self.loss, hparams.metrics.metrics_list, hparams.metrics.to_probabilities)
+        self.metrics = metrics
 
     def configure_optimizers(self):
         return self.optimizer
@@ -44,16 +44,25 @@ class DefaultClassificationLoop(AbstractBaseLoop):
     def training_step(self, batch, batch_idx):
         x, y_true = batch
         y_pred = self.model(x)
-        loss = self.metrics.metric_log(self, y_pred, y_true, DatasetSplit.TRAIN)
+        loss = self.loss(y_pred, y_true)
+
+        self.log('train/loss', loss, on_step=False, on_epoch=True)
+        self.metrics.metric_log(self, y_pred, y_true, DatasetSplit.TRAIN)
 
         return {'loss': loss}
 
     def validation_step(self, batch, batch_idx):
         x, y_true = batch
         y_pred = self.model(x)
+        loss = self.loss(y_pred, y_true)
+
+        self.log('val/loss', loss, on_step=False, on_epoch=True)
         self.metrics.metric_log(self, y_pred, y_true, DatasetSplit.VALIDATION)
 
     def test_step(self, batch, batch_idx):
         x, y_true = batch
         y_pred = self.model(x)
+        loss = self.loss(y_pred, y_true)
+
+        self.log('test/loss', loss, on_step=False, on_epoch=True)
         self.metrics.metric_log(self, y_pred, y_true, DatasetSplit.TEST)

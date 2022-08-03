@@ -1,0 +1,2 @@
+f1score:
+  _target_: torchmetrics.F1Score

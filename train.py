@@ -3,6 +3,8 @@ from hydra.utils import instantiate
 from omegaconf import DictConfig
 from pytorch_lightning import seed_everything, Trainer
 
+from logger.utils import Metrics
+
 
 @hydra.main(config_path='conf', config_name='config', version_base='1.2')
 def train(cfg: DictConfig):
@@ -11,10 +13,14 @@ def train(cfg: DictConfig):
     seed_everything(cfg.random_seed, workers=True)
 
     model = instantiate(cfg.model)
+    metrics = Metrics(metrics=[instantiate(m) for m in cfg.metrics.values()],
+                      to_probabilities=instantiate(cfg.to_probs))
+
     training_loop = instantiate(cfg.loop,
                                 # hparams for saving
                                 cfg,
                                 model=model,
+                                metrics=metrics,
                                 # pass model params to optimizer constructor
                                 optimizer={"params": model.parameters()})
 
