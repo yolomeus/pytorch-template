@@ -105,7 +105,7 @@ class AbstractDefaultDataModule(LightningDataModule):
 
 
 class ClassificationDataModule(AbstractDefaultDataModule):
-    """Datamodule for a standard classification setting with training instances and labels.
+    """Datamodule for a standard classification setting with in-memory training instances and labels.
     """
 
     @abstractmethod
