@@ -1,0 +1,2 @@
+_target_: logger.loggers.WandbMinMaxLogger
+save_dir: ${hydra:runtime.output_dir}
