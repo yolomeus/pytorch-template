@@ -1,5 +1,5 @@
-train_batch_size: ${training.batch_size}
-test_batch_size: ${testing.batch_size}
+train_batch_size: ${train_batch_size}
+test_batch_size: ${test_batch_size}
 num_workers: ${num_workers}
-persistent_workers: true
-pin_memory: true
+persistent_workers: True
+pin_memory: True

@@ -2,24 +2,26 @@ defaults:
   - model: mlp
   - datamodule: fashion_mnist
   - loop: default_loop
+  - logger: wandb_min_max
+  - callbacks:
+      - model_checkpoint
+      - early_stopping
 
+  - _self_
 
-gpus: 1
-num_workers: 4
 random_seed: 1590258941
+num_workers: 4
+log_gradients: False
 
-training:
-  epochs: 100
-  batch_size: 32
-  accumulate_batches: 1
-  # checkpointing
-  save_ckpts: 10
-  monitor: val/loss
-  mode: min
-  patience: 5
+trainer:
+  gpus: 1
+  max_epochs: 100
+  accumulate_grad_batches: 1
+  precision: 32
 
-testing:
-  batch_size: 512
+# accessed by base datamodule, here for convenience
+train_batch_size: 32
+test_batch_size: ${train_batch_size}
 
 metrics:
   # apply before passing to metrics
@@ -28,11 +30,6 @@ metrics:
     - _target_: torchmetrics.Accuracy
     - _target_: torchmetrics.F1Score
       num_classes: 10
-
-logger:
-  _target_: logger.loggers.WandbMinMaxLogger
-log_gradients: False
-
 
 hydra:
   run:

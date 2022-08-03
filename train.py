@@ -1,13 +1,10 @@
-import os
-
 import hydra
 from hydra.utils import instantiate
 from omegaconf import DictConfig
-from pytorch_lightning import Trainer, seed_everything
-from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
+from pytorch_lightning import seed_everything, Trainer
 
 
-@hydra.main(config_path='conf', config_name='config')
+@hydra.main(config_path='conf', config_name='config', version_base='1.2')
 def train(cfg: DictConfig):
     """Train a pytorch model specified by the config file"""
 
@@ -21,21 +18,7 @@ def train(cfg: DictConfig):
                                 # pass model params to optimizer constructor
                                 optimizer={"params": model.parameters()})
 
-    train_cfg = cfg.training
-    ckpt_path = os.path.join(os.getcwd(), 'checkpoints/')
-    filename = 'epoch-{epoch:03d}-' + train_cfg.monitor.replace('/', '_') + '-{' + train_cfg.monitor + ':.4f}'
-    model_checkpoint = ModelCheckpoint(save_top_k=train_cfg.save_ckpts,
-                                       monitor=train_cfg.monitor,
-                                       mode=train_cfg.mode,
-                                       verbose=True,
-                                       filename=filename,
-                                       auto_insert_metric_name=False,
-                                       dirpath=ckpt_path)
-
-    early_stopping = EarlyStopping(monitor=train_cfg.monitor,
-                                   patience=train_cfg.patience,
-                                   mode=train_cfg.mode,
-                                   verbose=True)
+    callbacks = [instantiate(cb) for cb in cfg.callbacks.values()]
 
     if cfg.logger is not None:
         logger = instantiate(cfg.logger)
@@ -45,12 +28,7 @@ def train(cfg: DictConfig):
         # setting to True will use the default logger
         logger = True
 
-    trainer = Trainer(max_epochs=train_cfg.epochs,
-                      gpus=cfg.gpus,
-                      logger=logger,
-                      callbacks=[model_checkpoint, early_stopping],
-                      accumulate_grad_batches=train_cfg.accumulate_batches)
-
+    trainer = Trainer(**cfg.trainer, logger=logger, callbacks=callbacks)
     datamodule = instantiate(cfg.datamodule)
 
     trainer.fit(training_loop, datamodule=datamodule)
