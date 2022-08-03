@@ -10,7 +10,6 @@ defaults:
       - accuracy
       - f1score
 
-
 random_seed: 1590258941
 num_workers: 4
 log_gradients: False
