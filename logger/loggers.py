@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.utilities import rank_zero_only
 
@@ -14,7 +12,6 @@ class WandbMinMaxLogger(WandbLogger):
         super().__init__(*args, **kwargs)
 
         self._postfix = postfix
-        self._bounds_dict = {}
 
     @rank_zero_only
     def log_metrics(self, metrics, step):
@@ -26,59 +23,20 @@ class WandbMinMaxLogger(WandbLogger):
         metrics = {k + self._postfix if k != 'epoch' else k: v
                    for k, v in metrics.items()}
         super().log_metrics(metrics, step)
-        for metric, value in metrics.items():
-            self._update_bounds(metric, value)
-        self._log_bounds()
+        for name, value in metrics.items():
+            min_name = self.min_name(name)
+            max_name = self.max_name(name)
+            self.experiment.summary[min_name] = min(self.experiment.summary.get(min_name, value),
+                                                    value)
+            self.experiment.summary[max_name] = max(self.experiment.summary.get(max_name, value),
+                                                    value)
 
-    def _update_bounds(self, name, value):
-        """Given a metric value and the name of a metric, update the metric´s new min and max values.
-
-        :param name: name/identifier of the metric.
-        :param value: newly recorded value.
+    def min_name(self, name):
+        """Name for the minimum value of this metric.
         """
-        bounds = self._bounds_dict.get(name, self.__MetricBounds(name, value, value))
-        bounds.update(value)
-        self._bounds_dict[name] = bounds
+        return name + self.LOGGER_JOIN_CHAR + 'min'
 
-    def _log_bounds(self):
-        """Log the current min and max bounds for each metric in the wandb summary.
+    def max_name(self, name):
+        """Name for the maximum value of this metric.
         """
-        summary = self.experiment.summary
-        for bounds in self._bounds_dict.values():
-            summary[bounds.min_name] = bounds.min_value
-            summary[bounds.max_name] = bounds.max_value
-
-    @dataclass
-    class __MetricBounds:
-        """Holds minimum and maximum value of a metric over time.
-
-        :param name: name of the metric.
-        :param max_value: current maximum of the metric.
-        :param min_value: current minimum of the metric.
-        """
-        name: str
-        max_value: int
-        min_value: int
-
-        def update(self, value):
-            """update the current min and max values based on a new value.
-
-            :param value: value to compare min and max to.
-            """
-            self.max_value = max(self.max_value, value)
-            self.min_value = min(self.min_value, value)
-
-        def __str__(self):
-            return f'{self.name}: (min: {self.min_value}, max: {self.max_value})'
-
-        @property
-        def min_name(self):
-            """Name for the minimum value of this metric.
-            """
-            return self.name + WandbMinMaxLogger.LOGGER_JOIN_CHAR + 'min'
-
-        @property
-        def max_name(self):
-            """Name for the maximum value of this metric.
-            """
-            return self.name + WandbMinMaxLogger.LOGGER_JOIN_CHAR + 'max'
+        return name + self.LOGGER_JOIN_CHAR + 'max'
