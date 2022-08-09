@@ -26,21 +26,21 @@ def train(cfg: DictConfig):
 
     callbacks = [instantiate(cb) for cb in cfg.callbacks.values()]
 
-    if cfg.logger is not None:
-        logger = instantiate(cfg.logger)
-        if cfg.log_gradients:
-            logger.experiment.watch(training_loop.model)
-    else:
-        # setting to True will use the default logger
-        logger = True
+    logger = instantiate(cfg.logger)
+    # only applies to wandb logger
+    if hasattr(logger, 'log_gradients') and logger.log_gradients:
+        logger.watch_gradients(training_loop)
 
     trainer = Trainer(**cfg.trainer, logger=logger, callbacks=callbacks)
     datamodule = instantiate(cfg.datamodule)
 
     trainer.fit(training_loop, datamodule=datamodule)
-
     # only look at this in the very end ;)
     trainer.test(ckpt_path='best', datamodule=datamodule)
+
+    # only applies to wandb logger
+    if hasattr(logger, 'finish'):
+        logger.finish()
 
 
 if __name__ == '__main__':

@@ -2,7 +2,7 @@ defaults:
   - model: mlp
   - datamodule: fashion_mnist
   - loop: default_loop
-  - logger: wandb_min_max
+  - logger: tensorboard
   - callbacks:
       - model_checkpoint
       - early_stopping
@@ -10,9 +10,10 @@ defaults:
       - accuracy
       - f1score
 
+  - _self_ # at end of defaults list to avoid hydra warning
+
 random_seed: 1590258941
 num_workers: 4
-log_gradients: False
 
 trainer:
   gpus: 1
@@ -32,8 +33,8 @@ to_probs:
 
 hydra:
   run:
-    dir: ./outputs/single/${model._target_}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    dir: logs/single/${model._target_}/${train_batch_size}/${loop.optimizer.lr}/${now:%Y-%m-%d}/${now:%H-%M-%S}
 
   sweep:
-    dir: outputs/sweep/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    dir: logs/sweep/${model._target_}/${train_batch_size}/${loop.optimizer.lr}/${now:%Y-%m-%d}/${now:%H-%M-%S}
     # subdir: lr:${loop.optimizer.lr}

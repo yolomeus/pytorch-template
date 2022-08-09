@@ -1,3 +1,4 @@
+import wandb
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.utilities import rank_zero_only
 
@@ -8,9 +9,9 @@ class WandbMinMaxLogger(WandbLogger):
 
     LOGGER_JOIN_CHAR = '/'
 
-    def __init__(self, postfix='', *args, **kwargs):
+    def __init__(self, postfix='', log_gradients=False, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
+        self.log_gradients = log_gradients
         self._postfix = postfix
 
     @rank_zero_only
@@ -40,3 +41,10 @@ class WandbMinMaxLogger(WandbLogger):
         """Name for the maximum value of this metric.
         """
         return name + self.LOGGER_JOIN_CHAR + 'max'
+
+    def watch_gradients(self, model):
+        self.experiment.watch(model)
+
+    @staticmethod
+    def finish():
+        wandb.finish()
