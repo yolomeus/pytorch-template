@@ -1,8 +1,8 @@
 from abc import abstractmethod
-from typing import Optional
+from typing import Optional, Callable, Iterable
 
 from pytorch_lightning import LightningDataModule
-from torch.utils.data import DataLoader, TensorDataset
+from torch.utils.data import DataLoader, TensorDataset, Dataset
 
 from datamodule import DatasetSplit
 
@@ -39,27 +39,27 @@ class AbstractDefaultDataModule(LightningDataModule):
             self._test_ds = self.test_ds()
 
     @abstractmethod
-    def train_ds(self):
+    def train_ds(self) -> Dataset:
         """Build the train pytorch dataset.
 
         :return: the train pytorch dataset.
         """
 
     @abstractmethod
-    def val_ds(self):
+    def val_ds(self) -> Dataset:
         """Build the validation pytorch dataset.
 
         :return: the validation pytorch dataset.
         """
 
     @abstractmethod
-    def test_ds(self):
+    def test_ds(self) -> Dataset:
         """Build the test pytorch dataset.
 
         :return: the test pytorch dataset.
         """
 
-    def train_dataloader(self):
+    def train_dataloader(self) -> DataLoader:
         train_dl = DataLoader(self._train_ds,
                               self._train_batch_size,
                               shuffle=True,
@@ -69,7 +69,7 @@ class AbstractDefaultDataModule(LightningDataModule):
                               persistent_workers=self._persistent_workers)
         return train_dl
 
-    def val_dataloader(self):
+    def val_dataloader(self) -> DataLoader:
         val_dl = DataLoader(self._val_ds,
                             self._test_batch_size,
                             num_workers=self._num_workers,
@@ -78,7 +78,7 @@ class AbstractDefaultDataModule(LightningDataModule):
                             persistent_workers=self._persistent_workers)
         return val_dl
 
-    def test_dataloader(self):
+    def test_dataloader(self) -> DataLoader:
         test_dl = DataLoader(self._test_ds,
                              self._test_batch_size,
                              num_workers=self._num_workers,
@@ -88,7 +88,7 @@ class AbstractDefaultDataModule(LightningDataModule):
         return test_dl
 
     # noinspection PyMethodMayBeStatic
-    def build_collate_fn(self, split: DatasetSplit = None):
+    def build_collate_fn(self, split: DatasetSplit = None) -> [Callable, None]:
         """Override to define a custom collate function. Build a function for collating multiple data instances into
         a batch. Defaults to returning `None` since it's the default for DataLoader's collate_fn argument.
 
@@ -109,18 +109,18 @@ class ClassificationDataModule(AbstractDefaultDataModule):
     """
 
     @abstractmethod
-    def instances_and_labels(self, split: DatasetSplit):
+    def instances_and_labels(self, split: DatasetSplit) -> Iterable:
         """Get tuple of instances and labels for classification based on the requested split.
 
         :param split: the dataset split use.
         :return (tuple): instances and labels for a specific split.
         """
 
-    def train_ds(self):
+    def train_ds(self) -> Dataset:
         return TensorDataset(*self.instances_and_labels(DatasetSplit.TRAIN))
 
-    def val_ds(self):
+    def val_ds(self) -> Dataset:
         return TensorDataset(*self.instances_and_labels(DatasetSplit.VALIDATION))
 
-    def test_ds(self):
+    def test_ds(self) -> Dataset:
         return TensorDataset(*self.instances_and_labels(DatasetSplit.TEST))
