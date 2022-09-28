@@ -48,7 +48,7 @@ Basic building blocks and optimization for deep neural networks:
 
 Wrapper around PyTorch for better code structure / easy use of accelerators:
 
-- `DataModule` for any dataset related code
+- `LightningDataModule` for any dataset related code
 - `LightningModule` for **training-loop**: encapsulates model, loss and optimizer
 - `Trainer` for setting up training (logging, callbacks, acceleration)
 
@@ -163,8 +163,8 @@ python train.py -m model.beeg_factor=1,5,10
 ### Summary
 
 In essence, this is all you need to know to make full use of this template. Each config group and its subgroups are
-found in `/conf/` and mirrored in the package structure. Just like the model, each part of training can be hot-swapped
-as soon as a config file and corresponding python class exists. This includes: Datamodules, callbacks, loggers,
+found in `conf/` and mirrored in the package structure. Just like the model, each part of training can be hot-swapped
+as soon as a **config file** and corresponding **python class** exist. This includes: DataModules, callbacks, loggers,
 optimizers, metrics and even the general training/optimization procedure (loop).
 
 ## Overall project structure
