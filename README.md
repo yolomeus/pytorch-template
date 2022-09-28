@@ -167,6 +167,9 @@ Hydra also provides a simple interface for gridsearch (there's also auto-ml plug
 python train.py -m model.beeg_factor=1,5,10
 ```
 
+Hydra will store any logs (including the configuration used) in a dedicated log directory. You can change the directory
+pattern at the bottom of `conf/config.yaml`. This is also where e.g. tensorboard logs will end up.
+
 ### Summary
 
 This is basically all you need to know to make full use of this template. Each config group and its subgroups are
