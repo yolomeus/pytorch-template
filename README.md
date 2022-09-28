@@ -78,8 +78,93 @@ Composable configurations in yaml, also overridable through the command line:
 
 </table>
 
-## Example: How to add a module
+## Example: Add a custom model and train it
 
-Let's say we want to introduce a custom PyTorch model to our project.
+Let's say you want to introduce a custom PyTorch model to the project that you call the **"Beeg Yoshi MLP"** which
+is simply a ridiculously wide MLP.
+
+### 1. Implement your model by subclassing `torch.nn.Module`:
+
+```python
+# model/mlp.py
+from torch.nn import Module, Linear, Sequential, ReLU
+
+
+class BeegYoshiMLP(Module):
+    """The Beeg Yoshi MLP. It's width will be the input_dim * beeg_factor.
+    """
+
+    def __init__(self, input_dim: int, output_dim: int, beeg_factor: int):
+        super().__init__()
+
+        h_dim = input_dim * beeg_factor
+        self.seq = Sequential(Linear(input_dim, h_dim),
+                              ReLU(),
+                              Linear(h_dim, output_dim))
+
+    def forward(self, inputs):
+        return self.seq(inputs)
+```
+
+We've placed this code in `model/mlp.py`. As you will see in the next step, the package structure is mirroring the
+config structure. As long as you can reference your class by its **module path** you can also change this structure.
+However, I'd encourage you to also mirror package and config structure.
+
+### 2. Add a yaml configuration for your model:
+
+```yaml
+# conf/model/beeg_mlp.yaml
+
+# Module path to our class. The _target_ field will be used 
+# to reference the class at instantiation and all other entries will be passed to the 
+_target_: model.mlp.BeegYoshiMLP
+
+# we will be training on fashion mnist, hence these dimensions
+input_dim: 784
+output_dim: 10
+# Tip: if you want to dynamically change dimensions based on the dataset you could use 
+# hydra's interpolation to reference the datamodule config e.g.: 
+# input_dim: ${datamodule.input_size}
+# check the hydra documentation for details
+
+# the default beeg_factor
+beeg_factor: 10
+```
+
+Because we've placed our yaml file in `conf/model/` it is now part of the **model** config group. This means we can
+select it from the defaults list in our root config file `conf/config.yaml`:
+
+```yaml
+# conf/config.yaml
+defaults:
+  - model: beeg_mlp
+  - datamodule: fashion_mnist
+  # ...
+```
+
+### 3. We're now all set up for training:
+
+```shell
+python train.py 
+```
+
+Yup that's it. If you don't want to edit the yaml file you can also override the model and its parameters via CLI:
+
+```shell
+python train.py model=beeg_mlp model.beeg_factor=20
+```
+
+Hydra also provides a simple interface for gridsearch (there's even AutoML search plugins for hydra):
+
+```shell
+python train.py -m model.beeg_factor=1,5,10
+```
+
+### Summary
+
+In essence, this is all you need to know to make full use of this template. Each config group and its subgroups are
+found in `/conf/` and mirrored in the package structure. Just like the model, each part of training can be hot-swapped
+as soon as a config file and corresponding python class exists. This includes: Datamodules, callbacks, loggers,
+optimizers, metrics and even the general training/optimization procedure (loop).
 
 ## Overall project structure
