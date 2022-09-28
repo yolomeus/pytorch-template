@@ -152,7 +152,10 @@ defaults:
 python train.py 
 ```
 
-Yup that's it. If you don't want to edit the yaml file you can also override the model and its parameters via CLI:
+Yup that's it. Our config will be automatically assembled and used in `train.py` to instantiate and assemble our
+components, then run the training procedure by calling `Trainer.fit()` on our datamodule (atm fashion-mnist).
+
+If you don't want to edit the yaml file you can also override the model and its parameters via CLI:
 
 ```shell
 python train.py model=beeg_mlp model.beeg_factor=20
