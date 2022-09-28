@@ -31,9 +31,9 @@ in `environment.yml` and install them manually using pip / put them into a `requ
 
 Basic building blocks and optimization for deep neural networks:
 
-- Differentiable math operations
-- `torch.nn` for higher level building blocks
-- common losses
+- [Differentiable math operations](https://pytorch.org/docs/stable/torch.html#math-operations)
+- [torch.nn](https://pytorch.org/docs/stable/nn.html) for higher level building blocks
+- [Common loss functions](https://pytorch.org/docs/stable/nn.html#loss-functions)
 
 </td>
 <td>
@@ -48,9 +48,12 @@ Basic building blocks and optimization for deep neural networks:
 
 Wrapper around PyTorch for better code structure / easy use of accelerators:
 
-- `LightningDataModule` for any dataset related code
-- `LightningModule` for **training-loop**: encapsulates model, loss and optimizer
-- `Trainer` for setting up training (logging, callbacks, acceleration)
+- [LightningDataModule](https://pytorch-lightning.readthedocs.io/en/stable/data/datamodule.html) for any dataset related
+  code
+- [LightningModule](https://pytorch-lightning.readthedocs.io/en/stable/common/lightning_module.html) for
+  **training-loop**: encapsulates model, loss and optimizer
+- [Trainer](https://pytorch-lightning.readthedocs.io/en/stable/common/trainer.html) for setting up training (logging,
+  callbacks, acceleration)
 
 </td>
 <td>
@@ -65,7 +68,8 @@ Wrapper around PyTorch for better code structure / easy use of accelerators:
 
 Composable configurations in yaml, also overridable through the command line:
 
-- Any module will be represented as **config / composition of configs**
+- Any module will be represented as 
+[**config / composition of configs**](https://hydra.cc/docs/tutorials/basic/your_first_app/simple_cli/)
 - We make hydra responsible for **instantiation**: any component can be swapped by specifying a **config**
 - Override parameters or even swap full configs via CLI
 
@@ -154,7 +158,7 @@ Yup that's it. If you don't want to edit the yaml file you can also override the
 python train.py model=beeg_mlp model.beeg_factor=20
 ```
 
-Hydra also provides a simple interface for gridsearch (there's even AutoML search plugins for hydra):
+Hydra also provides a simple interface for gridsearch (there's also auto-ml plugins for hydra, check the docs!):
 
 ```shell
 python train.py -m model.beeg_factor=1,5,10
