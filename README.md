@@ -68,8 +68,8 @@ Wrapper around PyTorch for better code structure / easy use of accelerators:
 
 Composable configurations in yaml, also overridable through the command line:
 
-- Any module will be represented as 
-[**config / composition of configs**](https://hydra.cc/docs/tutorials/basic/your_first_app/simple_cli/)
+- Any module will be represented as
+  [**config / composition of configs**](https://hydra.cc/docs/tutorials/basic/your_first_app/config_groups/)
 - We make hydra responsible for **instantiation**: any component can be swapped by specifying a **config**
 - Override parameters or even swap full configs via CLI
 
@@ -166,9 +166,50 @@ python train.py -m model.beeg_factor=1,5,10
 
 ### Summary
 
-In essence, this is all you need to know to make full use of this template. Each config group and its subgroups are
+This is basically all you need to know to make full use of this template. Each config group and its subgroups are
 found in `conf/` and mirrored in the package structure. Just like the model, each part of training can be hot-swapped
 as soon as a **config file** and corresponding **python class** exist. This includes: DataModules, callbacks, loggers,
 optimizers, metrics and even the general training/optimization procedure (loop).
 
-## Overall project structure
+## Project components
+
+When assembled, the Trainer is composed as follows:
+
+```shell
+Trainer
+├── cfg.trainer** # trainer args found in config.yaml
+├── loop
+│   ├── loss
+│   ├── optimizer
+│   ├── metrics
+│   └── model
+├── logger
+└── callbacks
+```
+
+### train.py
+
+This is the main script where training is started. Here, all training components are instantiated and assembled based
+on the hydra config.
+
+### Loop (loop.py)
+
+Loop is a `LightningModule` encapsulating **model**, **optimizer**, **loss function** (PyTorch) and **metrics**
+(torchmetrics). It is responsible for defining train, validation and test steps (including calling metrics).
+
+### DataModule (datamodule/*)
+
+The [DataModule](https://pytorch-lightning.readthedocs.io/en/stable/data/datamodule.html#) stores any code for fetching,
+pre-processing and iterating over a dataset by returning [DataLoaders](https://pytorch.org/docs/stable/data.html).
+
+### Logger (logger/loggers.py):
+
+[Logger](https://pytorch-lightning.readthedocs.io/en/stable/extensions/logging.html) that will be passed to the
+`Trainer`, needs to implement the `Logger` interface.
+
+### Metrics (logger/utils.py)
+
+Convenience class for managing a set of [torchmetrics](https://torchmetrics.readthedocs.io/en/stable/). Used in the
+default training loop to update metric state.
+
+
