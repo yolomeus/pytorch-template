@@ -1,9 +1,9 @@
 # PyTorch Template: PyTorch + Lightning + Hydra
 
 My template for deep learning projects using [PyTorch](https://pytorch.org/),
-[PyTorch Lightning](https://www.pytorchlightning.ai/) and [Hydra](https://hydra.cc/). It's designed to be as modular as
-by allowing to hot-swap different types of models, datasets, losses and optimization procedures. It also allows
-for easy iteration over different hyperparameters while keeping reproducibility in mind.
+[PyTorch Lightning](https://www.pytorchlightning.ai/) and [Hydra](https://hydra.cc/). It's designed with modularity in mind
+by allowing to hot-swap different types of models, datasets, losses and optimization procedures. It also supports
+for easy iteration over different hyperparameters while preserving reproducibility.
 
 ## Requirements
 
